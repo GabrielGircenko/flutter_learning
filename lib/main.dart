@@ -1,60 +1,67 @@
 import 'package:flutter/material.dart';
 
-// import 'app_screens/home.dart';
-
 void main() => runApp(MaterialApp(
-      title: "Exploring UI widgets",
-      home: Scaffold(
-        appBar: AppBar(title: Text("Basic List View")),
-        body: getListViewLong(),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => debugPrint("FAB clicked"),
-          child: Icon(Icons.add),
-          tooltip: "Add One More Item",
-        ),
-      ),
+      title: "Stateful App Example",
+      home: FavoriteCity(),
     ));
 
-void showSnackBar(BuildContext context, String text) {
-  var snackBar = SnackBar(
-    content: Text("You just tapped $text"),
-    action: SnackBarAction(
-        label: "UNDO",
-        onPressed: () => debugPrint("Performing dummy UNDO operation")),
-  );
-
-  Scaffold.of(context).showSnackBar(snackBar);
+class FavoriteCity extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _FavoriteCityState();
+  }
 }
 
-List<String> getListElements() =>
-    List<String>.generate(1000, (counter) => "Item $counter");
+class _FavoriteCityState extends State<FavoriteCity> {
+  String nameCity = "";
+  var _currencies = ["Rupees", "Dollar", "Pounds", "Others"];
+  var _currentItemSelected = "Rupees";
 
-Widget getListViewLong() {
-  var listItems = getListElements();
+  @override
+  Widget build(BuildContext context) {
+    debugPrint("Favorite City widget is created");
 
-  var listView = ListView.builder(
-      itemBuilder: (context, index) => ListTile(
-          title: Text(listItems[index]),
-          leading: Icon(Icons.arrow_right),
-          onTap: () => showSnackBar(context, listItems[index])));
-
-  return listView;
-}
-
-Widget getListView() => ListView(
-      children: <Widget>[
-        ListTile(
-          leading: Icon(Icons.landscape),
-          title: Text("Landscape"),
-          subtitle: Text("Beautiful view!"),
-          trailing: Icon(Icons.wb_sunny),
-          onTap: () {
-            debugPrint("Landscape tapped");
-          },
+    return Scaffold(
+      appBar: AppBar(title: Text("Stateful Example")),
+      body: Container(
+        margin: EdgeInsets.all(16),
+        child: Column(
+          children: <Widget>[
+            TextField(
+              onSubmitted: (String userInput) {
+                setState(() {
+                  debugPrint("setState is called");
+                  nameCity = userInput;
+                });
+              },
+            ),
+            DropdownButton<String>(
+              items: _currencies.map((String dropDownStringItem) {
+                return DropdownMenuItem<String>(
+                  value: dropDownStringItem,
+                  child: Text(dropDownStringItem),
+                );
+              }).toList(),
+              onChanged: (String newValueSelected) {
+                _onDropDownItemSelected(newValueSelected);
+              },
+              value: _currentItemSelected,
+            ),
+            Padding(
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  "Your best city is $nameCity",
+                  style: TextStyle(fontSize: 20),
+                ))
+          ],
         ),
-        ListTile(
-            leading: Icon(Icons.laptop_chromebook), title: Text("Windows")),
-        ListTile(leading: Icon(Icons.phone), title: Text("Phone")),
-        Text("Yet another widget")
-      ],
+      ),
     );
+  }
+
+  void _onDropDownItemSelected(String newValueSelected) {
+    setState(() {
+      this._currentItemSelected = newValueSelected;
+    });
+  }
+}
