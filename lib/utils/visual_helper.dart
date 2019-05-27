@@ -31,4 +31,12 @@ class VisualHelper {
         return Icon(Icons.keyboard_arrow_right);
     }
   }
+
+  static void showAlertDialog(BuildContext context, String title, String message) {
+    AlertDialog alertDialog = AlertDialog(
+      title: Text(title),
+      content: Text(message),
+    );
+    showDialog(context: context, builder: (_) => alertDialog);
+  }
 }

@@ -15,65 +15,73 @@ class Settings extends StatefulWidget {
 class SettingsState extends State<Settings> {
   DatabaseHelper databaseHelper = DatabaseHelper();
   List<Priority> priorityList;
+  List<TextEditingController> priorityControllers;
   var _formKey = GlobalKey<FormState>();
   int count = 0;
 
-  var titleController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
-    var textStyle = Theme
-        .of(context)
-        .textTheme
-        .title;
+    var textStyle = Theme.of(context).textTheme.title;
+
+    if (priorityList == null) {
+      updateListView();
+    }
 
     return Scaffold(
         appBar: AppBar(
-          title: Text("Settings"),
+          title: Text("Priority Settings"),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            debugPrint("FAB clicked");
+          },
+          tooltip: "Add Priority",
+          child: Icon(Icons.add),
         ),
         body: Form(
             key: _formKey,
-            child: ListView.builder(
-                itemCount: count + 1,
-                itemBuilder: (BuildContext context, int position) {
-                  if (position == count) {
-                    return TextFormField(
-                      controller: titleController,
-                      decoration: InputDecoration(
-                          hintText: "Priority Title",
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5))),
-                    );
-                  } else {
-                    return Card(
-                      color: Colors.white,
-                      elevation: 2,
-                      child: ListTile(
-                        leading: CircleAvatar(
-                            backgroundColor: VisualHelper.getPriorityColor(
-                                this.priorityList[position].priorityId),
-                            child: VisualHelper.getPriorityIcon(
-                                this.priorityList[position].priorityId)),
-                        title: Text(
-                          this.priorityList[position].title,
-                          style: textStyle,
-                        ),
-                        trailing: GestureDetector(
-                          child: Icon(
-                            Icons.delete,
-                            color: Colors.grey,
-                          ),
-                          onTap: () {
-                            _delete(context, this.priorityList[position]);
-                          },
-                        ),
-                        onTap: () {
-                          debugPrint("Priority Tapped");
-                        },
-                      ),
-                    );
-                  }
-                })));
+            child: Padding(
+                padding: EdgeInsets.all(16),
+                child: ListView.builder(
+                    itemCount: count,
+                    itemBuilder: (BuildContext context, int position) {
+                      return Card(
+                          color: Colors.white,
+                          elevation: 2,
+                          child: ListTile(
+                              leading: CircleAvatar(
+                                  backgroundColor:
+                                      VisualHelper.getPriorityColor(this
+                                          .priorityList[position]
+                                          .priorityId),
+                                  child: VisualHelper.getPriorityIcon(
+                                      this.priorityList[position].priorityId)),
+                              title: TextFormField(
+                                  controller: priorityControllers[position],
+                                  validator: (String value) {
+                                    if (value.isEmpty) {
+                                      return "Please enter the priority title.";
+
+                                    } else {
+                                      debugPrint(
+                                          "Something changed in Title Text Field");
+                                      updateTitle(position);
+                                    }
+                                  },
+                                  onFieldSubmitted: (_) => _save(position)),
+                              trailing: GestureDetector(
+                                child: Icon(
+                                  Icons.delete,
+                                  color: Colors.grey,
+                                ),
+                                onTap: () {
+                                  _delete(context, this.priorityList[position]);
+                                },
+                              ),
+                              onTap: () {
+                                debugPrint("Priority Tapped");
+                              }));
+                    }))));
   }
 
   void _delete(BuildContext context, Priority priority) async {
@@ -94,13 +102,72 @@ class SettingsState extends State<Settings> {
   void updateListView() {
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();
     dbFuture.then((database) {
-      Future<List<Priority>> priorityListFuture = databaseHelper.getPriorityList();
+      Future<List<Priority>> priorityListFuture =
+          databaseHelper.getPriorityList();
       priorityListFuture.then((priorityList) {
         setState(() {
           this.priorityList = priorityList;
           this.count = priorityList.length;
+          this.priorityControllers = List<TextEditingController>();
+          for (int i = 0; i < this.count; i++) {
+            this.priorityControllers.add(TextEditingController(
+                text: priorityList[i].title != null
+                    ? priorityList[i].title
+                    : "",
+
+            ));
+          }
         });
       });
     });
+  }
+
+  void updateTitle(int position) {
+    priorityList[position].title = priorityControllers[position].text;
+  }
+
+  // Save data to database
+  void _save(int position) async {
+    if (_formKey.currentState.validate()) {
+      int result;
+      if (priorityList[position].priorityId != null) {
+        // Case 1: Update operation
+        result = await databaseHelper.updatePriority(priorityList[position]);
+      } else {
+        // Case 2: Insert Operation
+        result = await databaseHelper.insertPriority(priorityList[position]);
+      }
+
+      if (result != 0) {
+        // Success
+        VisualHelper.showAlertDialog(
+            context, "Status", "Priority Saved Successfully");
+      } else {
+        // Failure
+        VisualHelper.showAlertDialog(
+            context, "Status", "Problem Saving Priority");
+      }
+    }
+  }
+
+  void _delete2(int position) async {
+    // Case 1: If user is trying to delete the NEW NOTE i.e. he has come to
+    // the detail page by pressing the FAB of NoteList page.
+    if (priorityList[position].priorityId == null) {
+      VisualHelper.showAlertDialog(
+          context, "Status", "No Priority was deleted");
+      return;
+    }
+
+    // Case 2: User is trying to delete the old note that already has a valid ID.
+    int result =
+        await databaseHelper.deletePriority(priorityList[position].priorityId);
+    if (result != 0) {
+      VisualHelper.showAlertDialog(
+          context, "Status", "Priority Deleted Successfully");
+    } else {
+      VisualHelper.showAlertDialog(
+          context, "Status", "Error Occured while Deleting Priority");
+    }
   }
 }
