@@ -13,12 +13,12 @@ class DatabaseHelper {
 
   final String noteTable = "note_table";
   final String priorityTable = "priority_table";
-  final String colId = "id";
-  final String colTitle = "title";
-  final String colDescription = "description";
-  final String colPriorityId = "priorityId";
-  final String colDate = "date";
-  final String colPriorityTitle = "title";
+  static final String colId = "id";
+  static final String colTitle = "title";
+  static final String colDescription = "description";
+  static final String colPriorityId = "priorityId";
+  static final String colDate = "date";
+  static final String colPriorityTitle = "title";
 
   final String noteTableOld = "_note_table_old";
   final String priorityTableOld = "_priority_table_old";

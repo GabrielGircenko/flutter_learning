@@ -1,3 +1,5 @@
+import 'package:flutter_learning/utils/database_helper.dart';
+
 class Priority {
   int _priorityId;
   String _title;
@@ -19,15 +21,15 @@ class Priority {
   Map<String, dynamic> toMap() {
     var map = Map<String, dynamic>();
 
-    if (priorityId != null) map["priorityId"] = _priorityId;
+    if (priorityId != null) map[DatabaseHelper.colPriorityId] = _priorityId;
 
-    map["title"] = _title;
+    map[DatabaseHelper.colPriorityTitle] = _title;
 
     return map;
   }
 
   Priority.fromMapObject(Map<String, dynamic> map) {
-    this._priorityId = map["priorityId"];
-    this._title = map["title"];
+    this._priorityId = map[DatabaseHelper.colPriorityId];
+    this._title = map[DatabaseHelper.colPriorityTitle];
   }
 }

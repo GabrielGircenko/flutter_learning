@@ -1,3 +1,5 @@
+import 'package:flutter_learning/utils/database_helper.dart';
+
 class Note {
   int _id;
   String _title;
@@ -45,21 +47,21 @@ class Note {
   Map<String, dynamic> toMap() {
     var map = Map<String, dynamic>();
 
-    if (id != null) map["id"] = _id;
+    if (id != null) map[DatabaseHelper.colId] = _id;
 
-    map["title"] = _title;
-    map["description"] = _description;
-    map["priorityId"] = _priorityId;
-    map["date"] = _date;
+    map[DatabaseHelper.colTitle] = _title;
+    map[DatabaseHelper.colDescription] = _description;
+    map[DatabaseHelper.colPriorityId] = _priorityId;
+    map[DatabaseHelper.colDate] = _date;
 
     return map;
   }
 
   Note.fromMapObject(Map<String, dynamic> map) {
-    this._id = map["id"];
-    this._title = map["title"];
-    this._description = map["description"];
-    this._priorityId = map["priorityId"];
-    this._date = map["date"];
+    this._id = map[DatabaseHelper.colId];
+    this._title = map[DatabaseHelper.colTitle];
+    this._description = map[DatabaseHelper.colDescription];
+    this._priorityId = map[DatabaseHelper.colPriorityId];
+    this._date = map[DatabaseHelper.colDate];
   }
 }
