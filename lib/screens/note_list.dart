@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_learning/models/priority.dart';
+import 'package:flutter_learning/screens/settings.dart';
 import 'package:sqflite/sqflite.dart';
 import 'note_details.dart';
 import 'dart:async';
 import 'package:flutter_learning/utils/database_helper.dart';
 import 'package:flutter_learning/models/note.dart';
+import 'package:flutter_learning/utils/visual_helper.dart';
 
 class NoteList extends StatefulWidget {
   @override
@@ -15,10 +18,16 @@ class NoteList extends StatefulWidget {
 class NoteListState extends State<NoteList> {
   DatabaseHelper databaseHelper = DatabaseHelper();
   List<Note> noteList;
-  int count = 0;
+  List<Priority> priorityList;
+  int noteCount = 0;
+  int priorityCount = 0;
 
   @override
   Widget build(BuildContext context) {
+    if (priorityList == null) {
+      priorityList = List<Priority>();
+    }
+
     if (noteList == null) {
       noteList = List<Note>();
       updateListView();
@@ -27,6 +36,13 @@ class NoteListState extends State<NoteList> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Notes"),
+        actions: <Widget>[
+          IconButton(icon: Icon(Icons.settings),
+          tooltip: "Settings",
+          onPressed: () {
+            navigateToSettings();
+          },)
+        ],
       ),
       body: getNoteListView(),
       floatingActionButton: FloatingActionButton(
@@ -44,7 +60,7 @@ class NoteListState extends State<NoteList> {
     TextStyle titleStyle = Theme.of(context).textTheme.subhead;
 
     return ListView.builder(
-        itemCount: count,
+        itemCount: noteCount,
         itemBuilder: (BuildContext context, int position) {
           return Card(
             color: Colors.white,
@@ -52,8 +68,8 @@ class NoteListState extends State<NoteList> {
             child: ListTile(
               leading: CircleAvatar(
                   backgroundColor:
-                      getPriorityColor(this.noteList[position].priority),
-                  child: getPriorityIcon(this.noteList[position].priority)),
+                      VisualHelper.getPriorityColor(this.noteList[position].priorityId),
+                  child: VisualHelper.getPriorityIcon(this.noteList[position].priorityId)),
               title: Text(
                 this.noteList[position].title,
                 style: titleStyle,
@@ -77,31 +93,6 @@ class NoteListState extends State<NoteList> {
         });
   }
 
-  // Returns the priority color
-  Color getPriorityColor(int priority) {
-    switch (priority) {
-      case 1:
-        return Colors.red;
-
-      case 2:
-        return Colors.yellow;
-
-      default:
-        return Colors.blue;
-    }
-  }
-
-  // Returns the priority icon
-  Icon getPriorityIcon(int priority) {
-    switch (priority) {
-      case 1:
-        return Icon(Icons.play_arrow);
-
-      default:
-        return Icon(Icons.keyboard_arrow_right);
-    }
-  }
-
   void _delete(BuildContext context, Note note) async {
     int result = await databaseHelper.deleteNote(note.id);
     if (result != 0) {
@@ -115,6 +106,16 @@ class NoteListState extends State<NoteList> {
       content: Text(message),
     );
     Scaffold.of(context).showSnackBar(snackBar);
+  }
+
+  void navigateToSettings() async {
+    bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return Settings();
+    }));
+
+    if (result) {
+      updateListView();
+    }
   }
 
   void navigateToDetails(Note note, String title) async {
@@ -134,7 +135,7 @@ class NoteListState extends State<NoteList> {
       noteListFuture.then((noteList) {
         setState(() {
           this.noteList = noteList;
-          this.count = noteList.length;
+          this.noteCount = noteList.length;
         });
       });
     });

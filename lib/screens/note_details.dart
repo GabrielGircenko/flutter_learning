@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'note_details.dart';
-import 'dart:async';
 import 'package:flutter_learning/utils/database_helper.dart';
 import 'package:flutter_learning/models/note.dart';
 import 'package:intl/intl.dart';
@@ -70,7 +68,7 @@ class NoteDetailsState extends State<NoteDetails> {
                             );
                           }).toList(),
                           style: textStyle,
-                          value: getPriorityAsString(note.priority),
+                          value: getPriorityAsString(note.priorityId),
                           onChanged: (valueSelectedByUser) {
                             setState(() {
                               debugPrint("User selected $valueSelectedByUser");
@@ -183,11 +181,11 @@ class NoteDetailsState extends State<NoteDetails> {
   void updatePriorityAnswer(String value) {
     switch (value) {
       case "High":
-        note.priority = 1;
+        note.priorityId = 1;
         break;
 
       case "Low":
-        note.priority = 2;
+        note.priorityId = 2;
         break;
     }
   }

@@ -3,11 +3,11 @@ class Note {
   String _title;
   String _description;
   String _date;
-  int _priority;
+  int _priorityId;
 
-  Note(this._title, this._date, this._priority, [this._description]);
+  Note(this._title, this._date, this._priorityId, [this._description]);
 
-  Note.withId(this._id, this._title, this._date, this._priority,
+  Note.withId(this._id, this._title, this._date, this._priorityId,
       [this._description]);
 
   int get id => _id;
@@ -16,7 +16,7 @@ class Note {
 
   String get description => _description;
 
-  int get priority => _priority;
+  int get priorityId => _priorityId;
 
   String get date => _date;
 
@@ -32,9 +32,9 @@ class Note {
     }
   }
 
-  set priority(int newPriority) {
+  set priorityId(int newPriority) {
     if (newPriority >= 1 && newPriority <= 2) {
-      this._priority = newPriority;
+      this._priorityId = newPriority;
     }
   }
 
@@ -49,7 +49,7 @@ class Note {
 
     map["title"] = _title;
     map["description"] = _description;
-    map["priority"] = _priority;
+    map["priorityId"] = _priorityId;
     map["date"] = _date;
 
     return map;
@@ -59,7 +59,7 @@ class Note {
     this._id = map["id"];
     this._title = map["title"];
     this._description = map["description"];
-    this._priority = map["priority"];
+    this._priorityId = map["priorityId"];
     this._date = map["date"];
   }
 }
