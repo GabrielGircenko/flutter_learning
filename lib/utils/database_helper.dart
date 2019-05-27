@@ -78,22 +78,28 @@ class DatabaseHelper {
   void _upgradeDb(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < newVersion) {
       if (oldVersion == 1) {
-        _createPriorityTable(db);
-        db.execute("PRAGMA foreign_keys=off;"
-            ""
-            "BEGIN TRANSACTION;"
-            ""
-            "ALTER TABLE $noteTable RENAME TO $noteTableOld;"
-            ""
-            "$_getCreateNoteTableQuery"
-            ""
-            "INSERT INTO $noteTable ($colId, $colTitle, $colDescription, $colPriorityId, $colDate)"
-            "SELECT $colId, $colTitle, $colDescription, $colPriorityIdOld, $colDate"
-            "FROM $noteTableOld;"
-            ""
-            "COMMIT;"
-            ""
-            "PRAGMA foreign_keys=on;");
+        await db.execute(
+//            "PRAGMA foreign_keys=off;"
+//            ""
+//            "BEGIN TRANSACTION;"
+//            ""
+            "ALTER TABLE $noteTable RENAME TO $noteTableOld;");
+//            ""
+            await db.execute(_getCreateNoteTableQuery());
+//            ""
+        await db.execute("INSERT INTO $noteTable ($colId, $colTitle, $colDescription, $colPriorityId, $colDate) "
+            "SELECT $colId, $colTitle, $colDescription, $colPriorityIdOld, $colDate "
+            "FROM $noteTableOld;");
+//            ""
+        await db.execute(_getCreatePriorityTableQuery());
+//            ""
+        await db.execute("INSERT INTO $priorityTable ($colPriorityId) "
+            "SELECT $colPriorityIdOld "
+            "FROM $noteTableOld;");
+//            "COMMIT;"
+//            ""
+//            "PRAGMA foreign_keys=on;"
+//            );
       }
     }
   }
