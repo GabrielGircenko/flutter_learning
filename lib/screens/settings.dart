@@ -34,6 +34,7 @@ class SettingsState extends State<Settings> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             debugPrint("FAB clicked");
+            _addBlankCard();
           },
           tooltip: "Add Priority",
           child: Icon(Icons.add),
@@ -114,7 +115,6 @@ class SettingsState extends State<Settings> {
                 text: priorityList[i].title != null
                     ? priorityList[i].title
                     : "",
-
             ));
           }
         });
@@ -169,5 +169,10 @@ class SettingsState extends State<Settings> {
       VisualHelper.showAlertDialog(
           context, "Status", "Error Occured while Deleting Priority");
     }
+  }
+
+  void _addBlankCard() {
+    count++;
+    updateListView();
   }
 }

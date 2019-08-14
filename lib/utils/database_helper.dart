@@ -11,18 +11,19 @@ class DatabaseHelper {
 
   final String _db = "notes.db";
 
-  final String noteTable = "note_table";
-  final String priorityTable = "priority_table";
+  final String _noteTable = "note_table";
+  final String _priorityTable = "priority_table";
   static final String colId = "id";
   static final String colTitle = "title";
   static final String colDescription = "description";
   static final String colPriorityId = "priorityId";
   static final String colDate = "date";
+  static final String colPriorityPosition = "position";
   static final String colPriorityTitle = "title";
 
-  final String noteTableOld = "_note_table_old";
-  final String priorityTableOld = "_priority_table_old";
-  final String colPriorityIdOld = "priority";
+  final String _noteTableOld = "_note_table_old";
+  final String _priorityTableOld = "_priority_table_old";
+  final String _colPriorityIdOld = "priority";
 
   DatabaseHelper._createInstance();
 
@@ -57,8 +58,9 @@ class DatabaseHelper {
   }
 
   String _getCreatePriorityTableQuery() {
-    return "CREATE TABLE $priorityTable("
+    return "CREATE TABLE $_priorityTable("
         "$colPriorityId INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "$colPriorityPosition INTEGER , "
         "$colPriorityTitle TEXT)";
   }
 
@@ -67,7 +69,7 @@ class DatabaseHelper {
   }
 
   String _getCreateNoteTableQuery() {
-    return "CREATE TABLE $noteTable("
+    return "CREATE TABLE $_noteTable("
         "$colId INTEGER PRIMARY KEY AUTOINCREMENT, "
         "$colTitle TEXT,"
         "$colDescription TEXT,"
@@ -79,28 +81,27 @@ class DatabaseHelper {
     if (oldVersion < newVersion) {
       if (oldVersion == 1) {
         await db.execute(
-//            "PRAGMA foreign_keys=off;"
-//            ""
-//            "BEGIN TRANSACTION;"
-//            ""
-            "ALTER TABLE $noteTable RENAME TO $noteTableOld;");
-//            ""
+            "ALTER TABLE $_noteTable RENAME TO $_noteTableOld;");
             await db.execute(_getCreateNoteTableQuery());
-//            ""
-        await db.execute("INSERT INTO $noteTable ($colId, $colTitle, $colDescription, $colPriorityId, $colDate) "
-            "SELECT $colId, $colTitle, $colDescription, $colPriorityIdOld, $colDate "
-            "FROM $noteTableOld;");
-//            ""
+        await db.execute("INSERT INTO $_noteTable ($colId, $colTitle, $colDescription, $colPriorityId, $colDate) "
+            "SELECT $colId, $colTitle, $colDescription, $_colPriorityIdOld, $colDate "
+            "FROM $_noteTableOld;");
         await db.execute(_getCreatePriorityTableQuery());
-//            ""
-        await db.execute("INSERT INTO $priorityTable ($colPriorityId) "
-            "SELECT $colPriorityIdOld "
-            "FROM $noteTableOld;");
-//            "COMMIT;"
-//            ""
-//            "PRAGMA foreign_keys=on;"
-//            );
+        await db.execute("INSERT INTO $_priorityTable ($colPriorityPosition) "
+            "SELECT $_colPriorityIdOld "
+            "FROM $_noteTableOld;");
+
+      } else if (oldVersion == 2) {
+        await db.execute(
+            "ALTER TABLE $_priorityTable RENAME TO $_priorityTableOld;");
+
+        await db.execute("INSERT INTO $_priorityTable ($colPriorityPosition, $colPriorityTitle) "
+            "SELECT $colPriorityId, $colPriorityTitle "
+            "FROM $_priorityTableOld;");
       }
+
+      await db.execute("DROP TABLE IF EXISTS $_noteTableOld");
+      await db.execute("DROP TABLE IF EXISTS $_priorityTableOld");
     }
   }
 
@@ -109,7 +110,7 @@ class DatabaseHelper {
     Database db = await this.database;
 
 //    var result = await db.rawQuery("SELECT * FROM $noteTable order by $colPriority ASC");
-    var result = await db.query(noteTable, orderBy: "$colPriorityId ASC");
+    var result = await db.query(_noteTable, orderBy: "$colPriorityId ASC");
 
     return result;
   }
@@ -117,28 +118,28 @@ class DatabaseHelper {
   // Insert Operation: Insert a Note object to database
   Future<int> insertNote(Note note) async {
     Database db = await this.database;
-    var result = await db.insert(noteTable, note.toMap());
+    var result = await db.insert(_noteTable, note.toMap());
     return result;
   }
 
   // Update Operation: Update a Note object and save it to database
   Future<int> updateNote(Note note) async {
     var db = await this.database;
-    return await db.update(noteTable, note.toMap(),
+    return await db.update(_noteTable, note.toMap(),
         where: "$colId = ?", whereArgs: [note.id]);
   }
 
   // Delete Operation: Delete a Note object from database
   Future<int> deleteNote(int id) async {
     var db = await this.database;
-    return await db.rawDelete("DELETE FROM $noteTable WHERE $colId = $id");
+    return await db.rawDelete("DELETE FROM $_noteTable WHERE $colId = $id");
   }
 
   // Get number of Note objects in database
   Future<int> getNoteCount() async {
     Database db = await this.database;
     List<Map<String, dynamic>> x =
-        await db.rawQuery("SELECT COUNT (*) from $noteTable");
+        await db.rawQuery("SELECT COUNT (*) from $_noteTable");
     return Sqflite.firstIntValue(x);
   }
 
@@ -162,7 +163,7 @@ class DatabaseHelper {
     Database db = await this.database;
 
 //    var result = await db.rawQuery("SELECT * FROM $noteTable order by $colPriority ASC");
-    var result = await db.query(priorityTable, orderBy: "$colPriorityId ASC");
+    var result = await db.query(_priorityTable, orderBy: "$colPriorityId ASC");
 
     return result;
   }
@@ -170,14 +171,14 @@ class DatabaseHelper {
   // Insert Operation: Insert a Priority object to database
   Future<int> insertPriority(Priority priority) async {
     Database db = await this.database;
-    var result = await db.insert(priorityTable, priority.toMap());
+    var result = await db.insert(_priorityTable, priority.toMap());
     return result;
   }
 
   // Update Operation: Update a Priority object and save it to database
   Future<int> updatePriority(Priority priority) async {
     var db = await this.database;
-    return await db.update(priorityTable, priority.toMap(),
+    return await db.update(_priorityTable, priority.toMap(),
         where: "$colPriorityId = ?", whereArgs: [priority.priorityId]);
   }
 
@@ -185,14 +186,14 @@ class DatabaseHelper {
   Future<int> deletePriority(int priorityId) async {
     var db = await this.database;
     return await db.rawDelete(
-        "DELETE FROM $priorityTable WHERE $colPriorityId = $priorityId");
+        "DELETE FROM $_priorityTable WHERE $colPriorityId = $priorityId");
   }
 
   // Get number of Priority objects in database
   Future<int> getPriorityCount() async {
     Database db = await this.database;
     List<Map<String, dynamic>> x =
-        await db.rawQuery("SELECT COUNT (*) from $priorityTable");
+        await db.rawQuery("SELECT COUNT (*) from $_priorityTable");
     return Sqflite.firstIntValue(x);
   }
 
