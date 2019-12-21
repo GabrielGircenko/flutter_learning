@@ -4,19 +4,19 @@ import 'package:flutter_learning/models/note.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
 import 'package:intl/intl.dart';
 
-class NoteDetails extends StatefulWidget {
+class SubPriorityDetails extends StatefulWidget {
   final String appBarTitle;
   final Note note;
 
-  NoteDetails(this.note, this.appBarTitle);
+  SubPriorityDetails(this.note, this.appBarTitle);
 
   @override
   State<StatefulWidget> createState() {
-    return NoteDetailsState(this.note, this.appBarTitle);
+    return SubPriorityDetailsState(this.note, this.appBarTitle);
   }
 }
 
-class NoteDetailsState extends State<NoteDetails> {
+class SubPriorityDetailsState extends State<SubPriorityDetails> {
 
   var _formKey = GlobalKey<FormState>();
   static var _priorities = ["High", "Low"];
@@ -29,7 +29,7 @@ class NoteDetailsState extends State<NoteDetails> {
   var titleController = TextEditingController();
   var descriptionController = TextEditingController();
 
-  NoteDetailsState(this.note, this.appBarTitle);
+  SubPriorityDetailsState(this.note, this.appBarTitle);
 
   @override
   Widget build(BuildContext context) {

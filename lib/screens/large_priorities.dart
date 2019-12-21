@@ -5,14 +5,14 @@ import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'package:flutter_learning/utils/database_helper.dart';
 
-class Settings extends StatefulWidget {
+class LargePriorities extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return SettingsState();
+    return LargePrioritiesState();
   }
 }
 
-class SettingsState extends State<Settings> {
+class LargePrioritiesState extends State<LargePriorities> {
   DatabaseHelper databaseHelper = DatabaseHelper();
   List<Priority> priorityList;
   List<TextEditingController> priorityControllers;

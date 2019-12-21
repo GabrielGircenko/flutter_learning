@@ -8,14 +8,14 @@ import 'package:flutter_learning/utils/database_helper.dart';
 import 'package:flutter_learning/models/note.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
 
-class NoteList extends StatefulWidget {
+class SubPriorities extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return NoteListState();
+    return SubPrioritiesState();
   }
 }
 
-class NoteListState extends State<NoteList> {
+class SubPrioritiesState extends State<SubPriorities> {
   DatabaseHelper databaseHelper = DatabaseHelper();
   List<Note> noteList;
   List<Priority> priorityList;
@@ -110,7 +110,7 @@ class NoteListState extends State<NoteList> {
 
   void navigateToSettings() async {
     bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return Settings();
+      return LargePriorities();
     }));
 
     if (result) {
@@ -120,7 +120,7 @@ class NoteListState extends State<NoteList> {
 
   void navigateToDetails(Note note, String title) async {
     bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return NoteDetails(note, title);
+      return SubPriorityDetails(note, title);
     }));
 
     if (result) {
