@@ -8,59 +8,59 @@ import 'package:flutter_learning/utils/database_helper.dart';
 import 'package:flutter_learning/models/note.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
 
-class SubPriorities extends StatefulWidget {
+class TaskList extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return SubPrioritiesState();
+    return TaskListState();
   }
 }
 
-class SubPrioritiesState extends State<SubPriorities> {
+class TaskListState extends State<TaskList> {
   DatabaseHelper databaseHelper = DatabaseHelper();
-  List<Note> noteList;
-  List<Priority> priorityList;
-  int noteCount = 0;
-  int priorityCount = 0;
+  List<Task> taskList;
+  List<Project> projectList;
+  int taskCount = 0;
+  int projectCount = 0;
 
   @override
   Widget build(BuildContext context) {
-    if (priorityList == null) {
-      priorityList = List<Priority>();
+    if (projectList == null) {
+      projectList = List<Project>();
     }
 
-    if (noteList == null) {
-      noteList = List<Note>();
+    if (taskList == null) {
+      taskList = List<Task>();
       updateListView();
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Notes"),
+        title: Text("Tasks"),
         actions: <Widget>[
           IconButton(icon: Icon(Icons.settings),
-          tooltip: "Settings",
+          tooltip: "Projects",
           onPressed: () {
-            navigateToSettings();
+            navigateToProjects();
           },)
         ],
       ),
-      body: getNoteListView(),
+      body: getTaskListView(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           debugPrint("FAB clicked");
-          navigateToDetails(Note("", "", 2), "Add Note");
+          navigateToTaskDetails(Task("", "", 2), "Add Task");
         },
-        tooltip: "Add Note",
+        tooltip: "Add Task",
         child: Icon(Icons.add),
       ),
     );
   }
 
-  ListView getNoteListView() {
+  ListView getTaskListView() {
     TextStyle titleStyle = Theme.of(context).textTheme.subhead;
 
     return ListView.builder(
-        itemCount: noteCount,
+        itemCount: taskCount,
         itemBuilder: (BuildContext context, int position) {
           return Card(
             color: Colors.white,
@@ -68,35 +68,35 @@ class SubPrioritiesState extends State<SubPriorities> {
             child: ListTile(
               leading: CircleAvatar(
                   backgroundColor:
-                      VisualHelper.getPriorityColor(this.noteList[position].priorityId),
-                  child: VisualHelper.getPriorityIcon(this.noteList[position].priorityId)),
+                      VisualHelper.getPriorityColor(this.taskList[position].priorityId),
+                  child: VisualHelper.getPriorityIcon(this.taskList[position].priorityId)),
               title: Text(
-                this.noteList[position].title,
+                this.taskList[position].title,
                 style: titleStyle,
               ),
-              subtitle: Text(this.noteList[position].date),
+              subtitle: Text(this.taskList[position].date),
               trailing: GestureDetector(
                   child: Icon(
                 Icons.delete,
                 color: Colors.grey,
               ),
               onTap: () {
-                    _delete(context, this.noteList[position]);
+                    _delete(context, this.taskList[position]);
               },
               ),
               onTap: () {
                 debugPrint("ListTile Tapped");
-                navigateToDetails(this.noteList[position], "Edit Note");
+                navigateToTaskDetails(this.taskList[position], "Edit Note");
               },
             ),
           );
         });
   }
 
-  void _delete(BuildContext context, Note note) async {
-    int result = await databaseHelper.deleteNote(note.id);
+  void _delete(BuildContext context, Task task) async {
+    int result = await databaseHelper.deleteNote(task.id);
     if (result != 0) {
-      _showSnackBar(context, "Note Deleted Successfully");
+      _showSnackBar(context, "Task Deleted Successfully");
       updateListView();
     }
   }
@@ -108,7 +108,7 @@ class SubPrioritiesState extends State<SubPriorities> {
     Scaffold.of(context).showSnackBar(snackBar);
   }
 
-  void navigateToSettings() async {
+  void navigateToProjects() async {
     bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
       return LargePriorities();
     }));
@@ -118,9 +118,9 @@ class SubPrioritiesState extends State<SubPriorities> {
     }
   }
 
-  void navigateToDetails(Note note, String title) async {
+  void navigateToTaskDetails(Task note, String title) async {
     bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return SubPriorityDetails(note, title);
+      return TaskDetails(note, title);
     }));
 
     if (result) {
@@ -131,11 +131,11 @@ class SubPrioritiesState extends State<SubPriorities> {
   void updateListView() {
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();
     dbFuture.then((database) {
-      Future<List<Note>> noteListFuture = databaseHelper.getNoteList();
-      noteListFuture.then((noteList) {
+      Future<List<Task>> taskListFuture = databaseHelper.getNoteList();
+      taskListFuture.then((taskList) {
         setState(() {
-          this.noteList = noteList;
-          this.noteCount = noteList.length;
+          this.taskList = taskList;
+          this.taskCount = taskList.length;
         });
       });
     });

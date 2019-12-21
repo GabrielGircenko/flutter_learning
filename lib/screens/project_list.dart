@@ -14,7 +14,7 @@ class LargePriorities extends StatefulWidget {
 
 class LargePrioritiesState extends State<LargePriorities> {
   DatabaseHelper databaseHelper = DatabaseHelper();
-  List<Priority> priorityList;
+  List<Project> priorityList;
   List<TextEditingController> priorityControllers;
   var _formKey = GlobalKey<FormState>();
   int count = 0;
@@ -85,7 +85,7 @@ class LargePrioritiesState extends State<LargePriorities> {
                     }))));
   }
 
-  void _delete(BuildContext context, Priority priority) async {
+  void _delete(BuildContext context, Project priority) async {
     int result = await databaseHelper.deletePriority(priority.priorityId);
     if (result != 0) {
       _showSnackBar(context, "Priority Deleted Successfully");
@@ -103,7 +103,7 @@ class LargePrioritiesState extends State<LargePriorities> {
   void updateListView() {
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();
     dbFuture.then((database) {
-      Future<List<Priority>> priorityListFuture =
+      Future<List<Project>> priorityListFuture =
           databaseHelper.getPriorityList();
       priorityListFuture.then((priorityList) {
         setState(() {

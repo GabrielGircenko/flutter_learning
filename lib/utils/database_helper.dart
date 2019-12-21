@@ -116,14 +116,14 @@ class DatabaseHelper {
   }
 
   // Insert Operation: Insert a Note object to database
-  Future<int> insertNote(Note note) async {
+  Future<int> insertNote(Task note) async {
     Database db = await this.database;
     var result = await db.insert(_noteTable, note.toMap());
     return result;
   }
 
   // Update Operation: Update a Note object and save it to database
-  Future<int> updateNote(Note note) async {
+  Future<int> updateNote(Task note) async {
     var db = await this.database;
     return await db.update(_noteTable, note.toMap(),
         where: "$colId = ?", whereArgs: [note.id]);
@@ -144,15 +144,15 @@ class DatabaseHelper {
   }
 
   // Get the 'Map List' [ List<Map> ] and convert it to 'Note List' [ List<Note> ]
-  Future<List<Note>> getNoteList() async {
+  Future<List<Task>> getNoteList() async {
     var noteMapList = await getNoteMapList(); // Get 'Map List' from database
     int count =
         noteMapList.length; // Count the number of map entries in db table
 
-    List<Note> noteList = List<Note>();
+    List<Task> noteList = List<Task>();
     // For loop to create a 'Note List' from a 'Map List'
     for (int i = 0; i < count; i++) {
-      noteList.add(Note.fromMapObject(noteMapList[i]));
+      noteList.add(Task.fromMapObject(noteMapList[i]));
     }
 
     return noteList;
@@ -169,14 +169,14 @@ class DatabaseHelper {
   }
 
   // Insert Operation: Insert a Priority object to database
-  Future<int> insertPriority(Priority priority) async {
+  Future<int> insertPriority(Project priority) async {
     Database db = await this.database;
     var result = await db.insert(_priorityTable, priority.toMap());
     return result;
   }
 
   // Update Operation: Update a Priority object and save it to database
-  Future<int> updatePriority(Priority priority) async {
+  Future<int> updatePriority(Project priority) async {
     var db = await this.database;
     return await db.update(_priorityTable, priority.toMap(),
         where: "$colPriorityId = ?", whereArgs: [priority.priorityId]);
@@ -198,16 +198,16 @@ class DatabaseHelper {
   }
 
   // Get the 'Map List' [ List<Map> ] and convert it to 'Priority List' [ List<Priority> ]
-  Future<List<Priority>> getPriorityList() async {
+  Future<List<Project>> getPriorityList() async {
     var priorityMapList =
         await getPriorityMapList(); // Get 'Map List' from database
     int count =
         priorityMapList.length; // Count the number of map entries in db table
 
-    List<Priority> noteList = List<Priority>();
+    List<Project> noteList = List<Project>();
     // For loop to create a 'Priority List' from a 'Map List'
     for (int i = 0; i < count; i++) {
-      noteList.add(Priority.fromMapObject(priorityMapList[i]));
+      noteList.add(Project.fromMapObject(priorityMapList[i]));
     }
 
     return noteList;

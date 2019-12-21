@@ -1,15 +1,15 @@
 import 'package:flutter_learning/utils/database_helper.dart';
 
-class Note {
+class Task {
   int _id;
   String _title;
   String _description;
   String _date;
   int _priorityId;
 
-  Note(this._title, this._date, this._priorityId, [this._description]);
+  Task(this._title, this._date, this._priorityId, [this._description]);
 
-  Note.withId(this._id, this._title, this._date, this._priorityId,
+  Task.withId(this._id, this._title, this._date, this._priorityId,
       [this._description]);
 
   int get id => _id;
@@ -57,7 +57,7 @@ class Note {
     return map;
   }
 
-  Note.fromMapObject(Map<String, dynamic> map) {
+  Task.fromMapObject(Map<String, dynamic> map) {
     this._id = map[DatabaseHelper.colId];
     this._title = map[DatabaseHelper.colTitle];
     this._description = map[DatabaseHelper.colDescription];

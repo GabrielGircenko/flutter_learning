@@ -4,32 +4,32 @@ import 'package:flutter_learning/models/note.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
 import 'package:intl/intl.dart';
 
-class SubPriorityDetails extends StatefulWidget {
+class TaskDetails extends StatefulWidget {
   final String appBarTitle;
-  final Note note;
+  final Task task;
 
-  SubPriorityDetails(this.note, this.appBarTitle);
+  TaskDetails(this.task, this.appBarTitle);
 
   @override
   State<StatefulWidget> createState() {
-    return SubPriorityDetailsState(this.note, this.appBarTitle);
+    return TaskDetailsState(this.task, this.appBarTitle);
   }
 }
 
-class SubPriorityDetailsState extends State<SubPriorityDetails> {
+class TaskDetailsState extends State<TaskDetails> {
 
   var _formKey = GlobalKey<FormState>();
-  static var _priorities = ["High", "Low"];
+  static var _projects = ["High", "Low"]; // TODO change to empty Array
 
   DatabaseHelper databaseHelper = DatabaseHelper();
 
   String appBarTitle;
-  Note note;
+  Task task;
 
   var titleController = TextEditingController();
   var descriptionController = TextEditingController();
 
-  SubPriorityDetailsState(this.note, this.appBarTitle);
+  TaskDetailsState(this.task, this.appBarTitle);
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +38,8 @@ class SubPriorityDetailsState extends State<SubPriorityDetails> {
         .textTheme
         .title;
 
-    titleController.text = note.title;
-    descriptionController.text = note.description;
+    titleController.text = task.title;
+    descriptionController.text = task.description;
 
     return WillPopScope(
         onWillPop: () {
@@ -86,10 +86,10 @@ class SubPriorityDetailsState extends State<SubPriorityDetails> {
                         style: textStyle,
                         validator: (String value) {
                           if (value.isEmpty) {
-                            return "Please enter the title.";
+                            return "Please enter the task title.";
 
                           } else {
-                            debugPrint("Something changed in Title Text Field");
+                            debugPrint("Something changed in task title field");
                             updateTitle();
                           }
                         },
@@ -112,7 +112,7 @@ class SubPriorityDetailsState extends State<SubPriorityDetails> {
                         style: textStyle,
                         onChanged: (value) {
                           debugPrint(
-                              "Something changed in Description Text Field");
+                              "Something changed in task description field");
                           updateDescription();
                         },
                         decoration: InputDecoration(
@@ -178,29 +178,31 @@ class SubPriorityDetailsState extends State<SubPriorityDetails> {
     Navigator.pop(context, true);
   }
 
+  // TODO Change IntArray with Array<Int>
   // Convert the String priority in the form of integer before saving it to Database
   void updatePriorityAnswer(String value) {
     switch (value) {
       case "High":
-        note.priorityId = 1;
+        task.priorityId = 1;
         break;
 
       case "Low":
-        note.priorityId = 2;
+        task.priorityId = 2;
         break;
     }
   }
 
+  // TODO Change IntArray with Array<Int>
   // Convert int priority String priority and display it to the user in DropDown
   String getPriorityAsString(int value) {
     String priority;
     switch (value) {
       case 1:
-        priority = _priorities[0]; // "High"
+        priority = _projects[0]; // "High"
         break;
 
       case 2:
-        priority = _priorities[1]; // "Low"
+        priority = _projects[1]; // "Low"
         break;
     }
 
@@ -209,12 +211,12 @@ class SubPriorityDetailsState extends State<SubPriorityDetails> {
 
   // Update the title of Note object
   void updateTitle() {
-    note.title = titleController.text;
+    task.title = titleController.text;
   }
 
   // Update the description of Note object
   void updateDescription() {
-    note.description = descriptionController.text;
+    task.description = descriptionController.text;
   }
 
   // Save data to database
@@ -222,19 +224,20 @@ class SubPriorityDetailsState extends State<SubPriorityDetails> {
     if (_formKey.currentState.validate()) {
       moveToLastScreen();
 
-      note.date = DateFormat.yMMMd().format(DateTime.now());
+      task.date = DateFormat.yMMMd().format(DateTime.now());
       int result;
-      if (note.id != null) {
+      if (task.id != null) {
         // Case 1: Update operation
-        result = await databaseHelper.updateNote(note);
+        result = await databaseHelper.updateNote(task);
       } else {
         // Case 2: Insert Operation
-        result = await databaseHelper.insertNote(note);
+        result = await databaseHelper.insertNote(task);
       }
 
       if (result != 0) {
         // Success
         VisualHelper.showAlertDialog(context, "Status", "Note Saved Successfully");
+
       } else {
         // Failure
         VisualHelper.showAlertDialog(context, "Status", "Problem Saving Note");
@@ -247,13 +250,13 @@ class SubPriorityDetailsState extends State<SubPriorityDetails> {
 
     // Case 1: If user is trying to delete the NEW NOTE i.e. he has come to
     // the detail page by pressing the FAB of NoteList page.
-    if (note.id == null) {
+    if (task.id == null) {
       VisualHelper.showAlertDialog(context, "Status", "No Note was deleted");
       return;
     }
 
     // Case 2: User is trying to delete the old note that already has a valid ID.
-    int result = await databaseHelper.deleteNote(note.id);
+    int result = await databaseHelper.deleteNote(task.id);
     if (result != 0) {
       VisualHelper.showAlertDialog(context, "Status", "Note Deleted Successfully");
     } else {
