@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_learning/models/priority.dart';
-import 'package:flutter_learning/screens/settings.dart';
+import 'package:flutter_learning/screens/large_priorities.dart';
 import 'package:sqflite/sqflite.dart';
-import 'note_details.dart';
+import 'sub_priority_details.dart';
 import 'dart:async';
 import 'package:flutter_learning/utils/database_helper.dart';
 import 'package:flutter_learning/models/note.dart';

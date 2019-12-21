@@ -60,7 +60,7 @@ class NoteDetailsState extends State<NoteDetails> {
                 padding: EdgeInsets.all(16),
                 child: ListView(
                   children: <Widget>[
-                    ListTile(
+                    /*ListTile(
                       title: DropdownButton(
                           items: _priorities.map((String dropDownStringItem) {
                             return DropdownMenuItem<String>(
@@ -76,7 +76,7 @@ class NoteDetailsState extends State<NoteDetails> {
                               updatePriorityAnswer(valueSelectedByUser);
                             });
                           }),
-                    ),
+                    ),*/
 
                     // Second element
                     Padding(
