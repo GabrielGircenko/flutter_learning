@@ -110,6 +110,7 @@ class LargePrioritiesState extends State<LargePriorities> {
           this.priorityList = priorityList;
           this.count = priorityList.length;
           this.priorityControllers = List<TextEditingController>();
+
           for (int i = 0; i < this.count; i++) {
             this.priorityControllers.add(TextEditingController(
                 text: priorityList[i].title != null
@@ -133,6 +134,7 @@ class LargePrioritiesState extends State<LargePriorities> {
       if (priorityList[position].priorityId != null) {
         // Case 1: Update operation
         result = await databaseHelper.updatePriority(priorityList[position]);
+
       } else {
         // Case 2: Insert Operation
         result = await databaseHelper.insertPriority(priorityList[position]);
@@ -142,6 +144,7 @@ class LargePrioritiesState extends State<LargePriorities> {
         // Success
         VisualHelper.showAlertDialog(
             context, "Status", "Priority Saved Successfully");
+
       } else {
         // Failure
         VisualHelper.showAlertDialog(

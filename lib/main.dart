@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_learning/screens/sub_priorities.dart';
+import 'package:flutter_learning/screens/task_list.dart';
 
 double _padding = 16;
 double _halfPadding = 8;
