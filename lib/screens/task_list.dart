@@ -94,7 +94,7 @@ class TaskListState extends State<TaskList> {
   }
 
   void _delete(BuildContext context, Task task) async {
-    int result = await databaseHelper.deleteNote(task.id);
+    int result = await databaseHelper.deleteTask(task.id);
     if (result != 0) {
       _showSnackBar(context, "Task Deleted Successfully");
       updateTaskListView();

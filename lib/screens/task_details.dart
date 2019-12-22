@@ -228,10 +228,10 @@ class TaskDetailsState extends State<TaskDetails> {
       int result;
       if (task.id != null) {
         // Case 1: Update operation
-        result = await databaseHelper.updateNote(task);
+        result = await databaseHelper.updateTask(task);
       } else {
         // Case 2: Insert Operation
-        result = await databaseHelper.insertNote(task);
+        result = await databaseHelper.insertTask(task);
       }
 
       if (result != 0) {
@@ -256,7 +256,7 @@ class TaskDetailsState extends State<TaskDetails> {
     }
 
     // Case 2: User is trying to delete the old note that already has a valid ID.
-    int result = await databaseHelper.deleteNote(task.id);
+    int result = await databaseHelper.deleteTask(task.id);
     if (result != 0) {
       VisualHelper.showAlertDialog(context, "Status", "Note Deleted Successfully");
     } else {

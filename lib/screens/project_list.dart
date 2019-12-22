@@ -86,7 +86,7 @@ class ProjectListState extends State<ProjectList> {
   }
 
   void _delete(BuildContext context, Project priority) async {
-    int result = await databaseHelper.deletePriority(priority.priorityId);
+    int result = await databaseHelper.deleteProject(priority.priorityId);
     if (result != 0) {
       _showSnackBar(context, "Priority Deleted Successfully");
       updateProjectListView();
@@ -104,7 +104,7 @@ class ProjectListState extends State<ProjectList> {
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();
     dbFuture.then((database) {
       Future<List<Project>> priorityListFuture =
-          databaseHelper.getPriorityList();
+          databaseHelper.getProjectList();
       priorityListFuture.then((priorityList) {
         setState(() {
           this.projectList = priorityList;
@@ -133,11 +133,11 @@ class ProjectListState extends State<ProjectList> {
       int result;
       if (projectList[position].priorityId != null) {
         // Case 1: Update operation
-        result = await databaseHelper.updatePriority(projectList[position]);
+        result = await databaseHelper.updateProject(projectList[position]);
 
       } else {
         // Case 2: Insert Operation
-        result = await databaseHelper.insertPriority(projectList[position]);
+        result = await databaseHelper.insertProject(projectList[position]);
       }
 
       if (result != 0) {
@@ -164,7 +164,7 @@ class ProjectListState extends State<ProjectList> {
 
     // Case 2: User is trying to delete the old note that already has a valid ID.
     int result =
-        await databaseHelper.deletePriority(projectList[position].priorityId);
+        await databaseHelper.deleteProject(projectList[position].priorityId);
     if (result != 0) {
       VisualHelper.showAlertDialog(
           context, "Status", "Priority Deleted Successfully");

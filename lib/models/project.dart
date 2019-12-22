@@ -21,15 +21,15 @@ class Project {
   Map<String, dynamic> toMap() {
     var map = Map<String, dynamic>();
 
-    if (priorityId != null) map[DatabaseHelper.colPriorityId] = _priorityId;
+    if (priorityId != null) map[DatabaseHelper.colProjectId] = _priorityId;
 
-    map[DatabaseHelper.colPriorityTitle] = _title;
+    map[DatabaseHelper.colProjectTitle] = _title;
 
     return map;
   }
 
   Project.fromMapObject(Map<String, dynamic> map) {
-    this._priorityId = map[DatabaseHelper.colPriorityId];
-    this._title = map[DatabaseHelper.colPriorityTitle];
+    this._priorityId = map[DatabaseHelper.colProjectId];
+    this._title = map[DatabaseHelper.colProjectTitle];
   }
 }

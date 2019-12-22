@@ -51,7 +51,7 @@ class Task {
 
     map[DatabaseHelper.colTitle] = _title;
     map[DatabaseHelper.colDescription] = _description;
-    map[DatabaseHelper.colPriorityId] = _priorityId;
+    map[DatabaseHelper.colProjectId] = _priorityId;
     map[DatabaseHelper.colDate] = _date;
 
     return map;
@@ -61,7 +61,7 @@ class Task {
     this._id = map[DatabaseHelper.colId];
     this._title = map[DatabaseHelper.colTitle];
     this._description = map[DatabaseHelper.colDescription];
-    this._priorityId = map[DatabaseHelper.colPriorityId];
+    this._priorityId = map[DatabaseHelper.colProjectId];
     this._date = map[DatabaseHelper.colDate];
   }
 }
