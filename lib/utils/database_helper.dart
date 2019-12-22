@@ -9,21 +9,27 @@ class DatabaseHelper {
   static DatabaseHelper _databaseHelper;
   static Database _database;
 
-  final String _db = "notes.db";
+  final String _db = "notes.db";   // TODO rename database file name to projects.db
+  final int _databaseVersion = 4;
 
-  final String _taskTable = "note_table";
-  final String _projectTable = "priority_table";
+  final String _taskTable = "task_table";
+  final String _projectTable = "project_table";
   static final String colId = "id";
-  static final String colTitle = "title";
-  static final String colDescription = "description";
-  static final String colProjectId = "priorityId";
   static final String colDate = "date";
+  static final String colDescription = "description";
+  static final String colProjectId = "projectId";
   static final String colProjectPosition = "position";
   static final String colProjectTitle = "title";
+  static final String colTaskPosition = "position";
+  static final String colTitle = "title";
 
-  final String _taskTableOld = "_note_table_old";
-  final String _projectTableOld = "_priority_table_old";
-  final String _colProjectIdOld = "priority";
+  final String _taskTableOld = "_task_table_old";
+  final String _projectTableOld = "_project_table_old";
+
+  final String _taskTableV1 = "note_table";
+  final String _projectTableV3 = "priority_table";
+  final String _colProjectIdV1 = "priority";
+  static final String colProjectIdV3 = "priorityId";
 
   DatabaseHelper._createInstance();
 
@@ -44,7 +50,7 @@ class DatabaseHelper {
     String path = directory.path + _db;
 
     var projectsDatabase = await openDatabase(path,
-        version: 2, onCreate: _createDb, onUpgrade: _upgradeDb);
+        version: _databaseVersion, onCreate: _createDb, onUpgrade: _upgradeDb);
     return projectsDatabase;
   }
 
@@ -60,7 +66,7 @@ class DatabaseHelper {
   String _getCreateProjectTableQuery() {
     return "CREATE TABLE $_projectTable("
         "$colProjectId INTEGER PRIMARY KEY AUTOINCREMENT, "
-        "$colProjectPosition INTEGER , "
+        "$colProjectPosition INTEGER, "
         "$colProjectTitle TEXT)";
   }
 
@@ -74,29 +80,56 @@ class DatabaseHelper {
         "$colTitle TEXT,"
         "$colDescription TEXT,"
         "$colProjectId INTEGER,"
-        "$colDate TEXT)";
+        "$colDate TEXT,"
+        "$colTaskPosition INTEGER)";
   }
 
+  // TODO Test upgrades
   void _upgradeDb(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < newVersion) {
       if (oldVersion == 1) {
         await db.execute(
-            "ALTER TABLE $_taskTable RENAME TO $_taskTableOld;");
-            await db.execute(_getCreateTaskTableQuery());
+            "ALTER TABLE $_taskTableV1 RENAME TO $_taskTableOld;");
+
+        await db.execute(_getCreateTaskTableQuery());
+
         await db.execute("INSERT INTO $_taskTable ($colId, $colTitle, $colDescription, $colProjectId, $colDate) "
-            "SELECT $colId, $colTitle, $colDescription, $_colProjectIdOld, $colDate "
+            "SELECT $colId, $colTitle, $colDescription, $_colProjectIdV1, $colDate "
             "FROM $_taskTableOld;");
+
         await db.execute(_getCreateProjectTableQuery());
+
         await db.execute("INSERT INTO $_projectTable ($colProjectPosition) "
-            "SELECT $_colProjectIdOld "
+            "SELECT $_colProjectIdV1 "
             "FROM $_taskTableOld;");
 
       } else if (oldVersion == 2) {
         await db.execute(
-            "ALTER TABLE $_projectTable RENAME TO $_projectTableOld;");
+            "ALTER TABLE $_projectTableV3 RENAME TO $_projectTableOld;");
+
+        await db.execute(_getCreateProjectTableQuery());
 
         await db.execute("INSERT INTO $_projectTable ($colProjectPosition, $colProjectTitle) "
             "SELECT $colProjectId, $colProjectTitle "
+            "FROM $_projectTableOld;");
+
+      } else if (oldVersion == 3) {
+        await db.execute(
+            "ALTER TABLE $_taskTableV1 RENAME TO $_taskTableOld;");
+
+        await db.execute(_getCreateTaskTableQuery());
+
+        await db.execute("INSERT INTO $_taskTable ($colId, $colTitle, $colDescription, $colProjectId, $colDate) "
+            "SELECT $colId, $colTitle, $colDescription, $_colProjectIdV1, $colDate "
+            "FROM $_taskTableOld;");
+
+        await db.execute(
+            "ALTER TABLE $_projectTableV3 RENAME TO $_projectTableOld;");
+
+        await db.execute(_getCreateProjectTableQuery());
+
+        await db.execute("INSERT INTO $_projectTable ($colProjectPosition, $colProjectTitle) "
+            "SELECT $colProjectIdV3, $colProjectTitle "
             "FROM $_projectTableOld;");
       }
 
