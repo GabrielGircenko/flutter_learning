@@ -19,7 +19,6 @@ class TaskDetails extends StatefulWidget {
 class TaskDetailsState extends State<TaskDetails> {
 
   var _formKey = GlobalKey<FormState>();
-  static var _projects = ["High", "Low"]; // TODO change to empty Array
 
   DatabaseHelper databaseHelper = DatabaseHelper();
 
@@ -60,25 +59,6 @@ class TaskDetailsState extends State<TaskDetails> {
                 padding: EdgeInsets.all(16),
                 child: ListView(
                   children: <Widget>[
-                    /*ListTile(
-                      title: DropdownButton(
-                          items: _priorities.map((String dropDownStringItem) {
-                            return DropdownMenuItem<String>(
-                              value: dropDownStringItem,
-                              child: Text(dropDownStringItem),
-                            );
-                          }).toList(),
-                          style: textStyle,
-                          value: getPriorityAsString(note.priorityId),
-                          onChanged: (valueSelectedByUser) {
-                            setState(() {
-                              debugPrint("User selected $valueSelectedByUser");
-                              updatePriorityAnswer(valueSelectedByUser);
-                            });
-                          }),
-                    ),*/
-
-                    // Second element
                     Padding(
                       padding: EdgeInsets.only(top: 16),
                       child: TextFormField(
@@ -103,8 +83,6 @@ class TaskDetailsState extends State<TaskDetails> {
                                 borderRadius: BorderRadius.circular(5))),
                       ),
                     ),
-
-                    // Third element
                     Padding(
                       padding: EdgeInsets.only(top: 16),
                       child: TextField(
@@ -122,8 +100,6 @@ class TaskDetailsState extends State<TaskDetails> {
                                 borderRadius: BorderRadius.circular(5))),
                       ),
                     ),
-
-                    // Fourth element
                     Padding(
                       padding: EdgeInsets.only(top: 16),
                       child: Row(
@@ -190,23 +166,6 @@ class TaskDetailsState extends State<TaskDetails> {
         task.priorityId = 2;
         break;
     }
-  }
-
-  // TODO Change IntArray with Array<Int>
-  // Convert int priority String priority and display it to the user in DropDown
-  String getPriorityAsString(int value) {
-    String priority;
-    switch (value) {
-      case 1:
-        priority = _projects[0]; // "High"
-        break;
-
-      case 2:
-        priority = _projects[1]; // "Low"
-        break;
-    }
-
-    return priority;
   }
 
   // Update the title of Note object
