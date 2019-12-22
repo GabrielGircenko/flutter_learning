@@ -144,7 +144,7 @@ class DatabaseHelper {
   }
 
   // Get the 'Map List' [ List<Map> ] and convert it to 'Note List' [ List<Note> ]
-  Future<List<Task>> getNoteList() async {
+  Future<List<Task>> getTaskList() async {
     var noteMapList = await getNoteMapList(); // Get 'Map List' from database
     int count =
         noteMapList.length; // Count the number of map entries in db table

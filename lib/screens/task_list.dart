@@ -30,7 +30,7 @@ class TaskListState extends State<TaskList> {
 
     if (taskList == null) {
       taskList = List<Task>();
-      updateListView();
+      updateTaskListView();
     }
 
     return Scaffold(
@@ -97,7 +97,7 @@ class TaskListState extends State<TaskList> {
     int result = await databaseHelper.deleteNote(task.id);
     if (result != 0) {
       _showSnackBar(context, "Task Deleted Successfully");
-      updateListView();
+      updateTaskListView();
     }
   }
 
@@ -110,11 +110,11 @@ class TaskListState extends State<TaskList> {
 
   void navigateToProjects() async {
     bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return LargePriorities();
+      return ProjectList();
     }));
 
     if (result) {
-      updateListView();
+      updateTaskListView();
     }
   }
 
@@ -124,14 +124,14 @@ class TaskListState extends State<TaskList> {
     }));
 
     if (result) {
-      updateListView();
+      updateTaskListView();
     }
   }
 
-  void updateListView() {
+  void updateTaskListView() {
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();
     dbFuture.then((database) {
-      Future<List<Task>> taskListFuture = databaseHelper.getNoteList();
+      Future<List<Task>> taskListFuture = databaseHelper.getTaskList();
       taskListFuture.then((taskList) {
         setState(() {
           this.taskList = taskList;

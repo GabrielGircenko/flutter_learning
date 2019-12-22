@@ -5,14 +5,14 @@ import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'package:flutter_learning/utils/database_helper.dart';
 
-class LargePriorities extends StatefulWidget {
+class ProjectList extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return LargePrioritiesState();
+    return ProjectListState();
   }
 }
 
-class LargePrioritiesState extends State<LargePriorities> {
+class ProjectListState extends State<ProjectList> {
   DatabaseHelper databaseHelper = DatabaseHelper();
   List<Project> priorityList;
   List<TextEditingController> priorityControllers;
@@ -24,19 +24,19 @@ class LargePrioritiesState extends State<LargePriorities> {
     var textStyle = Theme.of(context).textTheme.title;
 
     if (priorityList == null) {
-      updateListView();
+      updateProjectListView();
     }
 
     return Scaffold(
         appBar: AppBar(
-          title: Text("Priority Settings"),
+          title: Text("Projects"),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             debugPrint("FAB clicked");
             _addBlankCard();
           },
-          tooltip: "Add Priority",
+          tooltip: "Add Project",
           child: Icon(Icons.add),
         ),
         body: Form(
@@ -89,7 +89,7 @@ class LargePrioritiesState extends State<LargePriorities> {
     int result = await databaseHelper.deletePriority(priority.priorityId);
     if (result != 0) {
       _showSnackBar(context, "Priority Deleted Successfully");
-      updateListView();
+      updateProjectListView();
     }
   }
 
@@ -100,7 +100,7 @@ class LargePrioritiesState extends State<LargePriorities> {
     Scaffold.of(context).showSnackBar(snackBar);
   }
 
-  void updateListView() {
+  void updateProjectListView() {
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();
     dbFuture.then((database) {
       Future<List<Project>> priorityListFuture =
@@ -176,6 +176,6 @@ class LargePrioritiesState extends State<LargePriorities> {
 
   void _addBlankCard() {
     count++;
-    updateListView();
+    updateProjectListView();
   }
 }
