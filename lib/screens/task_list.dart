@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_learning/models/priority.dart';
+import 'package:flutter_learning/models/project.dart';
 import 'package:flutter_learning/screens/project_list.dart';
 import 'package:sqflite/sqflite.dart';
 import 'task_details.dart';
 import 'dart:async';
 import 'package:flutter_learning/utils/database_helper.dart';
-import 'package:flutter_learning/models/note.dart';
+import 'package:flutter_learning/models/task.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
 
 class TaskList extends StatefulWidget {

@@ -1,9 +1,9 @@
-import 'package:flutter_learning/models/priority.dart';
+import 'package:flutter_learning/models/project.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter_learning/models/note.dart';
+import 'package:flutter_learning/models/task.dart';
 
 class DatabaseHelper {
   static DatabaseHelper _databaseHelper;

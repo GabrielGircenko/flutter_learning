@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_learning/utils/database_helper.dart';
-import 'package:flutter_learning/models/note.dart';
+import 'package:flutter_learning/models/task.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
 import 'package:intl/intl.dart';
 

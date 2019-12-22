@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_learning/models/priority.dart';
+import 'package:flutter_learning/models/project.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
@@ -14,7 +14,7 @@ class ProjectList extends StatefulWidget {
 
 class ProjectListState extends State<ProjectList> {
   DatabaseHelper databaseHelper = DatabaseHelper();
-  List<Project> priorityList;
+  List<Project> projectList;
   List<TextEditingController> priorityControllers;
   var _formKey = GlobalKey<FormState>();
   int count = 0;
@@ -23,7 +23,7 @@ class ProjectListState extends State<ProjectList> {
   Widget build(BuildContext context) {
     var textStyle = Theme.of(context).textTheme.title;
 
-    if (priorityList == null) {
+    if (projectList == null) {
       updateProjectListView();
     }
 
@@ -53,10 +53,10 @@ class ProjectListState extends State<ProjectList> {
                               leading: CircleAvatar(
                                   backgroundColor:
                                       VisualHelper.getPriorityColor(this
-                                          .priorityList[position]
+                                          .projectList[position]
                                           .priorityId),
                                   child: VisualHelper.getPriorityIcon(
-                                      this.priorityList[position].priorityId)),
+                                      this.projectList[position].priorityId)),
                               title: TextFormField(
                                   controller: priorityControllers[position],
                                   validator: (String value) {
@@ -76,7 +76,7 @@ class ProjectListState extends State<ProjectList> {
                                   color: Colors.grey,
                                 ),
                                 onTap: () {
-                                  _delete(context, this.priorityList[position]);
+                                  _delete(context, this.projectList[position]);
                                 },
                               ),
                               onTap: () {
@@ -107,7 +107,7 @@ class ProjectListState extends State<ProjectList> {
           databaseHelper.getPriorityList();
       priorityListFuture.then((priorityList) {
         setState(() {
-          this.priorityList = priorityList;
+          this.projectList = priorityList;
           this.count = priorityList.length;
           this.priorityControllers = List<TextEditingController>();
 
@@ -124,20 +124,20 @@ class ProjectListState extends State<ProjectList> {
   }
 
   void updateTitle(int position) {
-    priorityList[position].title = priorityControllers[position].text;
+    projectList[position].title = priorityControllers[position].text;
   }
 
   // Save data to database
   void _save(int position) async {
     if (_formKey.currentState.validate()) {
       int result;
-      if (priorityList[position].priorityId != null) {
+      if (projectList[position].priorityId != null) {
         // Case 1: Update operation
-        result = await databaseHelper.updatePriority(priorityList[position]);
+        result = await databaseHelper.updatePriority(projectList[position]);
 
       } else {
         // Case 2: Insert Operation
-        result = await databaseHelper.insertPriority(priorityList[position]);
+        result = await databaseHelper.insertPriority(projectList[position]);
       }
 
       if (result != 0) {
@@ -156,7 +156,7 @@ class ProjectListState extends State<ProjectList> {
   void _delete2(int position) async {
     // Case 1: If user is trying to delete the NEW NOTE i.e. he has come to
     // the detail page by pressing the FAB of NoteList page.
-    if (priorityList[position].priorityId == null) {
+    if (projectList[position].priorityId == null) {
       VisualHelper.showAlertDialog(
           context, "Status", "No Priority was deleted");
       return;
@@ -164,7 +164,7 @@ class ProjectListState extends State<ProjectList> {
 
     // Case 2: User is trying to delete the old note that already has a valid ID.
     int result =
-        await databaseHelper.deletePriority(priorityList[position].priorityId);
+        await databaseHelper.deletePriority(projectList[position].priorityId);
     if (result != 0) {
       VisualHelper.showAlertDialog(
           context, "Status", "Priority Deleted Successfully");
