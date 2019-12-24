@@ -113,7 +113,7 @@ class TaskListState extends State<TaskList> {
       return ProjectList();
     }));
 
-    if (result) {
+    if (result != null) {
       updateTaskListView();
     }
   }
