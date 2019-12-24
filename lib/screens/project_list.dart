@@ -15,7 +15,7 @@ class ProjectList extends StatefulWidget {
 class ProjectListState extends State<ProjectList> {
   DatabaseHelper databaseHelper = DatabaseHelper();
   List<Project> projectList;
-  List<TextEditingController> priorityControllers;
+  List<TextEditingController> projectControllers;
   var _formKey = GlobalKey<FormState>();
 
   @override
@@ -57,10 +57,10 @@ class ProjectListState extends State<ProjectList> {
                                   child: VisualHelper.getPriorityIcon(
                                       this.projectList[position].priorityId)),
                               title: TextFormField(
-                                  controller: priorityControllers[position],
+                                  controller: projectControllers[position],
                                   validator: (String value) {
                                     if (value.isEmpty) {
-                                      return "Please enter the priority title.";
+                                      return "Please enter the project title.";
 
                                     } else {
                                       debugPrint(
@@ -69,25 +69,47 @@ class ProjectListState extends State<ProjectList> {
                                     }
                                   },
                                   onFieldSubmitted: (_) => _save(position)),
-                              trailing: GestureDetector(
-                                child: Icon(
-                                  Icons.delete,
-                                  color: Colors.grey,
-                                ),
-                                onTap: () {
-                                  _delete(context, this.projectList[position]);
-                                },
-                              ),
-                              onTap: () {
-                                debugPrint("Priority Tapped");
-                              }));
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,         
+                                children: <Widget>[
+                                  GestureDetector(
+                                    child: Icon(
+                                      Icons.delete,
+                                      color: Colors.grey,
+                                    ),
+                                    onTap: () {
+                                      _delete(context, this.projectList[position]);
+                                    },
+                                  ),
+                                  GestureDetector(
+                                    child: Icon(
+                                      Icons.delete,
+                                      color: Colors.grey,
+                                    ),
+                                    onTap: () {
+                                      _delete(context, this.projectList[position]);
+                                    },
+                                  ),
+                                  GestureDetector(
+                                    child: Icon(
+                                      Icons.delete,
+                                      color: Colors.grey,
+                                    ),
+                                    onTap: () {
+                                      _delete(context, this.projectList[position]);
+                                    },
+                                  ),
+                                  ]),
+                                  onTap: () {
+                                    debugPrint("Project Tapped");
+                                  }));
                     }))));
   }
 
   void _delete(BuildContext context, Project priority) async {
     int result = await databaseHelper.deleteProject(priority.priorityId);
     if (result != 0) {
-      _showSnackBar(context, "Priority Deleted Successfully");
+      _showSnackBar(context, "Project Deleted Successfully");
       updateProjectListView();
     }
   }
@@ -107,10 +129,10 @@ class ProjectListState extends State<ProjectList> {
       projectListFuture.then((projectList) {
         setState(() {
           this.projectList = projectList;
-          this.priorityControllers = List<TextEditingController>();
+          this.projectControllers = List<TextEditingController>();
 
           for (int i = 0; i < this.projectList.length; i++) {
-            this.priorityControllers.add(TextEditingController(
+            this.projectControllers.add(TextEditingController(
                 text: projectList[i].title != null
                     ? projectList[i].title
                     : "",
@@ -122,7 +144,7 @@ class ProjectListState extends State<ProjectList> {
   }
 
   void updateTitle(int position) {
-    projectList[position].title = priorityControllers[position].text;
+    projectList[position].title = projectControllers[position].text;
   }
 
   // Save data to database
@@ -141,12 +163,12 @@ class ProjectListState extends State<ProjectList> {
       if (result != 0) {
         // Success
         VisualHelper.showAlertDialog(
-            context, "Status", "Priority Saved Successfully");
+            context, "Status", "Project Saved Successfully");
 
       } else {
         // Failure
         VisualHelper.showAlertDialog(
-            context, "Status", "Problem Saving Priority");
+            context, "Status", "Problem Saving Project");
       }
     }
   }
