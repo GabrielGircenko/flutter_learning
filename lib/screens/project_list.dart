@@ -14,10 +14,9 @@ class ProjectList extends StatefulWidget {
 
 class ProjectListState extends State<ProjectList> {
   DatabaseHelper databaseHelper = DatabaseHelper();
-  List<Project> projectList;
+  List<Project> projectList = List<Project>();
   List<TextEditingController> priorityControllers;
   var _formKey = GlobalKey<FormState>();
-  int count = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +33,7 @@ class ProjectListState extends State<ProjectList> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             debugPrint("FAB clicked");
-            _addBlankCard();
+            _addBlankProject();
           },
           tooltip: "Add Project",
           child: Icon(Icons.add),
@@ -44,7 +43,7 @@ class ProjectListState extends State<ProjectList> {
             child: Padding(
                 padding: EdgeInsets.all(16),
                 child: ListView.builder(
-                    itemCount: count,
+                    itemCount: projectList.length,
                     itemBuilder: (BuildContext context, int position) {
                       return Card(
                           color: Colors.white,
@@ -103,18 +102,17 @@ class ProjectListState extends State<ProjectList> {
   void updateProjectListView() {
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();
     dbFuture.then((database) {
-      Future<List<Project>> priorityListFuture =
+      Future<List<Project>> projectListFuture =
           databaseHelper.getProjectList();
-      priorityListFuture.then((priorityList) {
+      projectListFuture.then((projectList) {
         setState(() {
-          this.projectList = priorityList;
-          this.count = priorityList.length;
+          this.projectList = projectList;
           this.priorityControllers = List<TextEditingController>();
 
-          for (int i = 0; i < this.count; i++) {
+          for (int i = 0; i < this.projectList.length; i++) {
             this.priorityControllers.add(TextEditingController(
-                text: priorityList[i].title != null
-                    ? priorityList[i].title
+                text: projectList[i].title != null
+                    ? projectList[i].title
                     : "",
             ));
           }
@@ -131,7 +129,7 @@ class ProjectListState extends State<ProjectList> {
   void _save(int position) async {
     if (_formKey.currentState.validate()) {
       int result;
-      if (projectList[position].priorityId != null) {
+      if (projectList[position] != null && projectList[position].priorityId != null) {
         // Case 1: Update operation
         result = await databaseHelper.updateProject(projectList[position]);
 
@@ -174,8 +172,9 @@ class ProjectListState extends State<ProjectList> {
     }
   }
 
-  void _addBlankCard() {
-    count++;
+  void _addBlankProject() {
+    projectList.add(new Project(""));
+    _save(projectList.length - 1);
     updateProjectListView();
   }
 }

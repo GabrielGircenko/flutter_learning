@@ -232,17 +232,16 @@ class DatabaseHelper {
 
   // Get the 'Map List' [ List<Map> ] and convert it to 'Project List' [ List<Project> ]
   Future<List<Project>> getProjectList() async {
-    var priorityMapList =
+    var projectMapList =
         await getProjectMapList(); // Get 'Map List' from database
-    int count =
-        priorityMapList.length; // Count the number of map entries in db table
+    int count = projectMapList.length; // Count the number of map entries in db table
 
-    List<Project> taskList = List<Project>();
+    List<Project> projectList = List<Project>();
     // For loop to create a 'Project List' from a 'Map List'
     for (int i = 0; i < count; i++) {
-      taskList.add(Project.fromMapObject(priorityMapList[i]));
+      projectList.add(Project.fromMapObject(projectMapList[i]));
     }
 
-    return taskList;
+    return projectList;
   }
 }
