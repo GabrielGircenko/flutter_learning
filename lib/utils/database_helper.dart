@@ -9,7 +9,7 @@ class DatabaseHelper {
   static DatabaseHelper _databaseHelper;
   static Database _database;
 
-  final String _db = "notes.db";   // TODO rename database file name to projects.db
+  final String _db = "projects.db";   // TODO updateDb renaming database file from notes.db in version 3->4
   final int _databaseVersion = 4;
 
   final String _taskTable = "task_table";
