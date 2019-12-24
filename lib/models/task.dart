@@ -5,11 +5,11 @@ class Task {
   String _title;
   String _description;
   String _date;
-  int _priorityId;
+  int _projectId;
 
-  Task(this._title, this._date, this._priorityId, [this._description]);
+  Task(this._title, this._date, this._projectId, [this._description]);
 
-  Task.withId(this._id, this._title, this._date, this._priorityId,
+  Task.withId(this._id, this._title, this._date, this._projectId,
       [this._description]);
 
   int get id => _id;
@@ -18,7 +18,7 @@ class Task {
 
   String get description => _description;
 
-  int get priorityId => _priorityId;
+  int get projectId => _projectId;
 
   String get date => _date;
 
@@ -34,9 +34,9 @@ class Task {
     }
   }
 
-  set priorityId(int newPriority) {
+  set projectId(int newPriority) {
     if (newPriority >= 1 && newPriority <= 2) {
-      this._priorityId = newPriority;
+      this._projectId = newPriority;
     }
   }
 
@@ -51,7 +51,7 @@ class Task {
 
     map[DatabaseHelper.colTitle] = _title;
     map[DatabaseHelper.colDescription] = _description;
-    map[DatabaseHelper.colProjectId] = _priorityId;
+    map[DatabaseHelper.colProjectId] = _projectId;
     map[DatabaseHelper.colDate] = _date;
 
     return map;
@@ -61,7 +61,7 @@ class Task {
     this._id = map[DatabaseHelper.colId];
     this._title = map[DatabaseHelper.colTitle];
     this._description = map[DatabaseHelper.colDescription];
-    this._priorityId = map[DatabaseHelper.colProjectId];
+    this._projectId = map[DatabaseHelper.colProjectId];
     this._date = map[DatabaseHelper.colDate];
   }
 }

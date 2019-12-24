@@ -53,9 +53,9 @@ class ProjectListState extends State<ProjectList> {
                                   backgroundColor:
                                       VisualHelper.getPriorityColor(this
                                           .projectList[position]
-                                          .priorityId),
+                                          .projectId),
                                   child: VisualHelper.getPriorityIcon(
-                                      this.projectList[position].priorityId)),
+                                      this.projectList[position].projectId)),
                               title: TextFormField(
                                   controller: projectControllers[position],
                                   validator: (String value) {
@@ -74,20 +74,20 @@ class ProjectListState extends State<ProjectList> {
                                 children: <Widget>[
                                   GestureDetector(
                                     child: Icon(
-                                      Icons.delete,
+                                      Icons.arrow_upward,
                                       color: Colors.grey,
                                     ),
                                     onTap: () {
-                                      _delete(context, this.projectList[position]);
+                                      _reorder(context, this.projectList[position], 1);
                                     },
                                   ),
                                   GestureDetector(
                                     child: Icon(
-                                      Icons.delete,
+                                      Icons.arrow_downward,
                                       color: Colors.grey,
                                     ),
                                     onTap: () {
-                                      _delete(context, this.projectList[position]);
+                                      _reorder(context, this.projectList[position], -1);
                                     },
                                   ),
                                   GestureDetector(
@@ -106,10 +106,18 @@ class ProjectListState extends State<ProjectList> {
                     }))));
   }
 
-  void _delete(BuildContext context, Project priority) async {
-    int result = await databaseHelper.deleteProject(priority.priorityId);
+  void _delete(BuildContext context, Project project) async {
+    int result = await databaseHelper.deleteProject(project.projectId);
     if (result != 0) {
       _showSnackBar(context, "Project Deleted Successfully");
+      updateProjectListView();
+    }
+  }
+
+  void _reorder(BuildContext context, Project project, int movementType) async {
+    int result = await databaseHelper.reorderProject(project.projectId, movementType);
+    if (result != 0) {
+      _showSnackBar(context, "Project Moved Successfully");
       updateProjectListView();
     }
   }
@@ -151,7 +159,7 @@ class ProjectListState extends State<ProjectList> {
   void _save(int position) async {
     if (_formKey.currentState.validate()) {
       int result;
-      if (projectList[position] != null && projectList[position].priorityId != null) {
+      if (projectList[position] != null && projectList[position].projectId != null) {
         // Case 1: Update operation
         result = await databaseHelper.updateProject(projectList[position]);
 
@@ -176,7 +184,7 @@ class ProjectListState extends State<ProjectList> {
   void _delete2(int position) async {
     // Case 1: If user is trying to delete the NEW NOTE i.e. he has come to
     // the detail page by pressing the FAB of NoteList page.
-    if (projectList[position].priorityId == null) {
+    if (projectList[position].projectId == null) {
       VisualHelper.showAlertDialog(
           context, "Status", "No Priority was deleted");
       return;
@@ -184,7 +192,7 @@ class ProjectListState extends State<ProjectList> {
 
     // Case 2: User is trying to delete the old note that already has a valid ID.
     int result =
-        await databaseHelper.deleteProject(projectList[position].priorityId);
+        await databaseHelper.deleteProject(projectList[position].projectId);
     if (result != 0) {
       VisualHelper.showAlertDialog(
           context, "Status", "Priority Deleted Successfully");
@@ -195,7 +203,7 @@ class ProjectListState extends State<ProjectList> {
   }
 
   void _addBlankProject() {
-    projectList.add(new Project(""));
+    projectList.add(new Project.withTitleAndPosition("", projectList.length));
     _save(projectList.length - 1);
     updateProjectListView();
   }

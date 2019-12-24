@@ -202,9 +202,9 @@ class DatabaseHelper {
   }
 
   // Insert Operation: Insert a Project object to database
-  Future<int> insertProject(Project priority) async {
+  Future<int> insertProject(Project project) async {
     Database db = await this.database;
-    var result = await db.insert(_projectTable, priority.toMap());
+    var result = await db.insert(_projectTable, project.toMap());
     return result;
   }
 
@@ -212,11 +212,19 @@ class DatabaseHelper {
   Future<int> updateProject(Project project) async {
     var db = await this.database;
     return await db.update(_projectTable, project.toMap(),
-        where: "$colProjectId = ?", whereArgs: [project.priorityId]);
+        where: "$colProjectId = ?", whereArgs: [project.projectId]);
   }
 
   // Delete Operation: Delete a Project object from database
   Future<int> deleteProject(int projectId) async {
+    var db = await this.database;
+    return await db.rawDelete(
+        "DELETE FROM $_projectTable WHERE $colProjectId = $projectId");
+  }
+
+  // TODO Finish reorderProject method
+  // Reorder Operation: Reorder a Project object in database
+  Future<int> reorderProject(int projectId, int movementType) async {
     var db = await this.database;
     return await db.rawDelete(
         "DELETE FROM $_projectTable WHERE $colProjectId = $projectId");

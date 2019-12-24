@@ -159,11 +159,11 @@ class TaskDetailsState extends State<TaskDetails> {
   void updatePriorityAnswer(String value) {
     switch (value) {
       case "High":
-        task.priorityId = 1;
+        task.projectId = 1;
         break;
 
       case "Low":
-        task.priorityId = 2;
+        task.projectId = 2;
         break;
     }
   }

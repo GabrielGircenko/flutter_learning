@@ -68,8 +68,8 @@ class TaskListState extends State<TaskList> {
             child: ListTile(
               leading: CircleAvatar(
                   backgroundColor:
-                      VisualHelper.getPriorityColor(this.taskList[position].priorityId),
-                  child: VisualHelper.getPriorityIcon(this.taskList[position].priorityId)),
+                      VisualHelper.getPriorityColor(this.taskList[position].projectId),
+                  child: VisualHelper.getPriorityIcon(this.taskList[position].projectId)),
               title: Text(
                 this.taskList[position].title,
                 style: titleStyle,
