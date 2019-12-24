@@ -14,7 +14,7 @@ class ProjectList extends StatefulWidget {
 
 class ProjectListState extends State<ProjectList> {
   DatabaseHelper databaseHelper = DatabaseHelper();
-  List<Project> projectList = List<Project>();
+  List<Project> projectList;
   List<TextEditingController> priorityControllers;
   var _formKey = GlobalKey<FormState>();
 
@@ -43,7 +43,7 @@ class ProjectListState extends State<ProjectList> {
             child: Padding(
                 padding: EdgeInsets.all(16),
                 child: ListView.builder(
-                    itemCount: projectList.length,
+                    itemCount: _getProjectListCount(),
                     itemBuilder: (BuildContext context, int position) {
                       return Card(
                           color: Colors.white,
@@ -176,5 +176,14 @@ class ProjectListState extends State<ProjectList> {
     projectList.add(new Project(""));
     _save(projectList.length - 1);
     updateProjectListView();
+  }
+
+  int _getProjectListCount() {
+    if (this.projectList != null) {
+      return this.projectList.length;
+
+    } else {
+      return 0;
+    }
   }
 }
