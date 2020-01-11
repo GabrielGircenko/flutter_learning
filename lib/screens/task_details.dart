@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_learning/models/project.dart';
 import 'package:flutter_learning/utils/database_helper.dart';
 import 'package:flutter_learning/models/task.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
 import 'package:intl/intl.dart';
+import 'package:sqflite/sqlite_api.dart';
 
 class TaskDetails extends StatefulWidget {
   final String appBarTitle;
@@ -23,12 +25,15 @@ class TaskDetailsState extends State<TaskDetails> {
   DatabaseHelper databaseHelper = DatabaseHelper();
 
   String appBarTitle;
-  Task task;
+  Task _task;
+  List<Project> _projectList;
+  List<DropdownMenuItem<Project>> _dropdownMenuItems;
+  Project _selectedProject;
 
   var titleController = TextEditingController();
   var descriptionController = TextEditingController();
 
-  TaskDetailsState(this.task, this.appBarTitle);
+  TaskDetailsState(this._task, this.appBarTitle);
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +42,14 @@ class TaskDetailsState extends State<TaskDetails> {
         .textTheme
         .title;
 
-    titleController.text = task.title;
-    descriptionController.text = task.description;
+        
+    if (_projectList == null) {
+      _projectList = List<Project>();
+      _updateProjectDropdownView();
+    }
+
+    titleController.text = _task.title;
+    descriptionController.text = _task.description;
 
     return WillPopScope(
         onWillPop: () {
@@ -102,6 +113,14 @@ class TaskDetailsState extends State<TaskDetails> {
                     ),
                     Padding(
                       padding: EdgeInsets.only(top: 16),
+                      child: DropdownButton(
+                        value: _selectedProject,
+                        items: _dropdownMenuItems,
+                        onChanged: _onChangedProject,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 16),
                       child: Row(
                         children: <Widget>[
                           Expanded(
@@ -149,33 +168,67 @@ class TaskDetailsState extends State<TaskDetails> {
               )),
         ));
   }
+  
+  void _onChangedProject(Project selectedProject) {
+    setState(() {
+      _selectedProject = selectedProject; 
+      _updateTasksProjectId();
+    });
+  }
 
   void moveToLastScreen() {
     Navigator.pop(context, true);
   }
 
-  // TODO Change IntArray with Array<Int>
-  // Convert the String priority in the form of integer before saving it to Database
-  void updatePriorityAnswer(String value) {
-    switch (value) {
-      case "High":
-        task.projectId = 1;
-        break;
+  void _updateProjectDropdownView() {
+    final Future<Database> dbFuture = databaseHelper.initializeDatabase();
+    dbFuture.then((database) {
+      Future<List<Project>> projectListFuture =
+          databaseHelper.getProjectList();
+      projectListFuture.then((projectList) {
+        setState(() {
+          this._projectList = projectList;
+          this._dropdownMenuItems = _buildDropdownMenuItems(projectList);
+          /*this.projectControllers = List<TextEditingController>();
 
-      case "Low":
-        task.projectId = 2;
-        break;
+          for (int i = 0; i < this.projectList.length; i++) {
+            this.projectControllers.add(TextEditingController(
+                text: projectList[i].title != null
+                    ? projectList[i].title
+                    : "",
+            ));
+          }*/
+        });
+      });
+    });
+  }
+
+  List<DropdownMenuItem<Project>> _buildDropdownMenuItems(List<Project> list) {
+    List<DropdownMenuItem<Project>> items = List();
+    for (Project project in list) {
+      items.add(
+        DropdownMenuItem(
+          value: project,
+          child: Text(project.title)
+        )
+      );
     }
+
+    return items;
   }
 
   // Update the title of Note object
   void updateTitle() {
-    task.title = titleController.text;
+    _task.title = titleController.text;
   }
 
   // Update the description of Note object
   void updateDescription() {
-    task.description = descriptionController.text;
+    _task.description = descriptionController.text;
+  }
+
+  void _updateTasksProjectId() {
+    _task.projectId = _selectedProject.projectId;
   }
 
   // Save data to database
@@ -183,14 +236,15 @@ class TaskDetailsState extends State<TaskDetails> {
     if (_formKey.currentState.validate()) {
       moveToLastScreen();
 
-      task.date = DateFormat.yMMMd().format(DateTime.now());
+      _task.date = DateFormat.yMMMd().format(DateTime.now());
       int result;
-      if (task.id != null) {
+      if (_task.id != null) {
         // Case 1: Update operation
-        result = await databaseHelper.updateTask(task);
+        result = await databaseHelper.updateTask(_task);
+
       } else {
         // Case 2: Insert Operation
-        result = await databaseHelper.insertTask(task);
+        result = await databaseHelper.insertTask(_task);
       }
 
       if (result != 0) {
@@ -209,13 +263,13 @@ class TaskDetailsState extends State<TaskDetails> {
 
     // Case 1: If user is trying to delete the NEW NOTE i.e. he has come to
     // the detail page by pressing the FAB of NoteList page.
-    if (task.id == null) {
+    if (_task.id == null) {
       VisualHelper.showAlertDialog(context, "Status", "No Note was deleted");
       return;
     }
 
     // Case 2: User is trying to delete the old note that already has a valid ID.
-    int result = await databaseHelper.deleteTask(task.id);
+    int result = await databaseHelper.deleteTask(_task.id);
     if (result != 0) {
       VisualHelper.showAlertDialog(context, "Status", "Note Deleted Successfully");
     } else {
