@@ -47,7 +47,7 @@ class Task {
   Map<String, dynamic> toMap() {
     var map = Map<String, dynamic>();
 
-    if (id != null) map[DatabaseHelper.colId] = _id;
+    if (id != null) map[DatabaseHelper.colTaskId] = _id;
 
     map[DatabaseHelper.colTitle] = _title;
     map[DatabaseHelper.colDescription] = _description;
@@ -58,7 +58,7 @@ class Task {
   }
 
   Task.fromMapObject(Map<String, dynamic> map) {
-    this._id = map[DatabaseHelper.colId];
+    this._id = map[DatabaseHelper.colTaskId];
     this._title = map[DatabaseHelper.colTitle];
     this._description = map[DatabaseHelper.colDescription];
     this._projectId = map[DatabaseHelper.colProjectId];

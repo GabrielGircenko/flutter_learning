@@ -14,7 +14,7 @@ class DatabaseHelper {
 
   final String _taskTable = "task_table";
   final String _projectTable = "project_table";
-  static final String colId = "id";
+  static final String colTaskId = "id";
   static final String colDate = "date";
   static final String colDescription = "description";
   static final String colProjectId = "projectId";
@@ -76,7 +76,7 @@ class DatabaseHelper {
 
   String _getCreateTaskTableQuery() {
     return "CREATE TABLE $_taskTable("
-        "$colId INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "$colTaskId INTEGER PRIMARY KEY AUTOINCREMENT, "
         "$colTitle TEXT,"
         "$colDescription TEXT,"
         "$colProjectId INTEGER,"
@@ -93,8 +93,8 @@ class DatabaseHelper {
 
         await db.execute(_getCreateTaskTableQuery());
 
-        await db.execute("INSERT INTO $_taskTable ($colId, $colTitle, $colDescription, $colProjectId, $colDate) "
-            "SELECT $colId, $colTitle, $colDescription, $_colProjectIdV1, $colDate "
+        await db.execute("INSERT INTO $_taskTable ($colTaskId, $colTitle, $colDescription, $colProjectId, $colDate) "
+            "SELECT $colTaskId, $colTitle, $colDescription, $_colProjectIdV1, $colDate "
             "FROM $_taskTableOld;");
 
         await db.execute(_getCreateProjectTableQuery());
@@ -119,8 +119,8 @@ class DatabaseHelper {
 
         await db.execute(_getCreateTaskTableQuery());
 
-        await db.execute("INSERT INTO $_taskTable ($colId, $colTitle, $colDescription, $colProjectId, $colDate) "
-            "SELECT $colId, $colTitle, $colDescription, $_colProjectIdV1, $colDate "
+        await db.execute("INSERT INTO $_taskTable ($colTaskId, $colTitle, $colDescription, $colProjectId, $colDate) "
+            "SELECT $colTaskId, $colTitle, $colDescription, $_colProjectIdV1, $colDate "
             "FROM $_taskTableOld;");
 
         await db.execute(
@@ -159,13 +159,13 @@ class DatabaseHelper {
   Future<int> updateTask(Task task) async {
     var db = await this.database;
     return await db.update(_taskTable, task.toMap(),
-        where: "$colId = ?", whereArgs: [task.id]);
+        where: "$colTaskId = ?", whereArgs: [task.id]);
   }
 
   // Delete Operation: Delete a Task object from database
   Future<int> deleteTask(int id) async {
     var db = await this.database;
-    return await db.rawDelete("DELETE FROM $_taskTable WHERE $colId = $id");
+    return await db.rawDelete("DELETE FROM $_taskTable WHERE $colTaskId = $id");
   }
 
   // Get number of Task objects in database
@@ -176,6 +176,7 @@ class DatabaseHelper {
     return Sqflite.firstIntValue(x);
   }
 
+  // TODO Order by colProjectPosition
   // Get the 'Map List' [ List<Map> ] and convert it to 'Task List' [ List<Task> ]
   Future<List<Task>> getTaskList() async {
     var taskMapList = await getTaskMapList(); // Get 'Map List' from database
@@ -189,16 +190,6 @@ class DatabaseHelper {
     }
 
     return taskList;
-  }
-
-  // Fetch Operation: Get all priority objects from database
-  Future<List<Map<String, dynamic>>> getProjectMapList() async {
-    Database db = await this.database;
-
-//    var result = await db.rawQuery("SELECT * FROM $taskTable order by $colProject ASC");
-    var result = await db.query(_projectTable, orderBy: "$colProjectId ASC");
-
-    return result;
   }
 
   // Insert Operation: Insert a Project object to database
@@ -215,11 +206,34 @@ class DatabaseHelper {
         where: "$colProjectId = ?", whereArgs: [project.projectId]);
   }
 
+  // TODO Don't reorder if the project has the highest value of #colProjectId in the table
   // Delete Operation: Delete a Project object from database
   Future<int> deleteProject(int projectId) async {
     var db = await this.database;
-    return await db.rawDelete(
+    var result = await db.rawDelete(
         "DELETE FROM $_projectTable WHERE $colProjectId = $projectId");
+    
+    if (result != 0) {
+      return await _updateProjectPositionsAfterDelete();
+
+    } else {
+      return 0;
+    }
+  }
+
+  // TODO Make optimization algorithm which will decide if it's neccessary to reorder positions
+  Future<int> _updateProjectPositionsAfterDelete() async {
+    var projectList = await getProjectList();
+    var result = 1;
+
+    var db = await this.database;
+    for (int i = 0; i < projectList.length; i++) {
+      var id = projectList[i].projectId;
+      result *= await db.rawUpdate("UPDATE $_projectTable " 
+          "SET $colProjectPosition = $i WHERE $colProjectId = $id");
+    }
+
+    return result;
   }
 
   // TODO Finish reorderProject method
@@ -236,6 +250,13 @@ class DatabaseHelper {
     List<Map<String, dynamic>> x =
         await db.rawQuery("SELECT COUNT (*) from $_projectTable");
     return Sqflite.firstIntValue(x);
+  }
+
+  // Fetch Operation: Get all priority objects from database
+  Future<List<Map<String, dynamic>>> getProjectMapList() async {
+    Database db = await this.database;
+    var result = await db.query(_projectTable, orderBy: "$colProjectPosition ASC");
+    return result;
   }
 
   // Get the 'Map List' [ List<Map> ] and convert it to 'Project List' [ List<Project> ]

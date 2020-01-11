@@ -21,7 +21,6 @@ class ProjectListState extends State<ProjectList> {
   @override
   Widget build(BuildContext context) {
     var textStyle = Theme.of(context).textTheme.title;
-
     if (projectList == null) {
       updateProjectListView();
     }
