@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_learning/enums/movementType.dart';
 import 'package:flutter_learning/models/project.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
 import 'package:sqflite/sqflite.dart';
@@ -77,7 +78,7 @@ class ProjectListState extends State<ProjectList> {
                                       color: Colors.grey,
                                     ),
                                     onTap: () {
-                                      _reorder(context, this.projectList[position], 1);
+                                      _reorder(context, this.projectList[position], MovementType.moveUp);
                                     },
                                   ),
                                   GestureDetector(
@@ -86,7 +87,7 @@ class ProjectListState extends State<ProjectList> {
                                       color: Colors.grey,
                                     ),
                                     onTap: () {
-                                      _reorder(context, this.projectList[position], -1);
+                                      _reorder(context, this.projectList[position], MovementType.moveDown);
                                     },
                                   ),
                                   GestureDetector(
@@ -113,8 +114,8 @@ class ProjectListState extends State<ProjectList> {
     }
   }
 
-  void _reorder(BuildContext context, Project project, int movementType) async {
-    int result = await databaseHelper.reorderProject(project.projectId, movementType);
+  void _reorder(BuildContext context, Project project, MovementType movementType) async {
+    int result = await databaseHelper.reorderProject(project.projectPosition, movementType);
     if (result != 0) {
       _showSnackBar(context, "Project Moved Successfully");
       updateProjectListView();

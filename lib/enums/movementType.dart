@@ -1,0 +1,1 @@
+enum MovementType {moveUp, moveDown}

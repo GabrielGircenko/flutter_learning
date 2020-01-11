@@ -1,3 +1,4 @@
+import 'package:flutter_learning/enums/movementType.dart';
 import 'package:flutter_learning/models/project.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
@@ -238,10 +239,42 @@ class DatabaseHelper {
 
   // TODO Finish reorderProject method
   // Reorder Operation: Reorder a Project object in database
-  Future<int> reorderProject(int projectId, int movementType) async {
-    var db = await this.database;
-    return await db.rawDelete(
-        "DELETE FROM $_projectTable WHERE $colProjectId = $projectId");
+  Future<int> reorderProject(int projectPosition, MovementType movementType) async {
+    var projectList = await getProjectList();
+    var result = 1;
+    
+    if (movementType == MovementType.moveUp) {
+      if (projectPosition - 1 >= 0) {
+        var db = await this.database;
+        var id1 = projectList[projectPosition].projectId;
+        result *= await db.rawUpdate("UPDATE $_projectTable " 
+            "SET $colProjectPosition = $projectPosition-1 WHERE $colProjectId = $id1");
+
+        var id2 = projectList[projectPosition - 1].projectId;
+        result *= await db.rawUpdate("UPDATE $_projectTable " 
+            "SET $colProjectPosition = $projectPosition WHERE $colProjectId = $id2");
+
+      } else {
+        result = 0;
+      } 
+
+    } else {
+      if (projectPosition < projectList.length - 1) {
+        var db = await this.database;
+        var id1 = projectList[projectPosition].projectId;
+        result *= await db.rawUpdate("UPDATE $_projectTable " 
+            "SET $colProjectPosition = $projectPosition+1 WHERE $colProjectId = $id1");
+
+        var id2 = projectList[projectPosition + 1].projectId;
+        result *= await db.rawUpdate("UPDATE $_projectTable " 
+            "SET $colProjectPosition = $projectPosition WHERE $colProjectId = $id2");
+
+      } else {
+        result = 0;
+      }
+    }
+
+    return result;
   }
 
   // Get number of Project objects in database
