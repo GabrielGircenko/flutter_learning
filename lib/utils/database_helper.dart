@@ -143,8 +143,11 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getTaskMapList() async {
     Database db = await this.database;
 
-//    var result = await db.rawQuery("SELECT * FROM $taskTable order by $colProject ASC");
-    var result = await db.query(_taskTable, orderBy: "$colProjectId ASC");
+    // TODO Use INNER JOIN after setting taskPositions in a separate screen
+    var result = await db.rawQuery("SELECT $_taskTable.*, $_projectTable.$colProjectPosition as projectPosition "
+      "FROM $_taskTable "
+      "JOIN $_projectTable ON $_taskTable.$colProjectId = $_projectTable.$colProjectId "
+      "order by $_projectTable.$colProjectPosition ASC");
 
     return result;
   }

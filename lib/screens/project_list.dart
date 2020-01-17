@@ -182,8 +182,8 @@ class ProjectListState extends State<ProjectList> {
   }
 
   void _delete2(int position) async {
-    // Case 1: If user is trying to delete the NEW NOTE i.e. he has come to
-    // the detail page by pressing the FAB of NoteList page.
+    // Case 1: If user is trying to delete the NEW TASK i.e. he has come to
+    // the detail page by pressing the FAB of TaskList page.
     if (projectList[position].projectId == null) {
       VisualHelper.showAlertDialog(
           context, "Status", "No Priority was deleted");

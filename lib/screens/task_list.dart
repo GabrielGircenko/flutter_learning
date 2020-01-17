@@ -48,7 +48,7 @@ class TaskListState extends State<TaskList> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           debugPrint("FAB clicked");
-          navigateToTaskDetails(Task("", "", 2), "Add Task");
+          navigateToTaskDetails(Task("", "", -1, -1), "Add Task");
         },
         tooltip: "Add Task",
         child: Icon(Icons.add),

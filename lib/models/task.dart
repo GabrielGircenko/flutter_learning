@@ -5,11 +5,13 @@ class Task {
   String _title;
   String _description;
   String _date;
+  int _taskPosition;
   int _projectId = -1;
+  int _projectPosition = -1;
 
-  Task(this._title, this._date, this._projectId, [this._description]);
+  Task(this._title, this._date, this._projectId, this._projectPosition, [this._description]);
 
-  Task.withId(this._id, this._title, this._date, this._projectId,
+  Task.withId(this._id, this._title, this._date, this._projectId, this._projectPosition,
       [this._description]);
 
   int get id => _id;
@@ -18,7 +20,11 @@ class Task {
 
   String get description => _description;
 
+  int get taskPosition => _taskPosition;
+
   int get projectId => _projectId;
+
+  int get projectPosition => _projectPosition;
 
   String get date => _date;
 
@@ -32,6 +38,10 @@ class Task {
     if (newDescription.length <= 255) {
       this._description = newDescription;
     }
+  }
+
+  set taskPosition(int position) {
+    this._taskPosition = position;
   }
 
   set projectId(int newPriority) {
