@@ -35,9 +35,7 @@ class Task {
   }
 
   set projectId(int newPriority) {
-    if (newPriority >= 1 && newPriority <= 2) {
-      this._projectId = newPriority;
-    }
+    this._projectId = newPriority;
   }
 
   set date(String newDate) {
