@@ -5,7 +5,7 @@ class Task {
   String _title;
   String _description;
   String _date;
-  int _projectId;
+  int _projectId = -1;
 
   Task(this._title, this._date, this._projectId, [this._description]);
 

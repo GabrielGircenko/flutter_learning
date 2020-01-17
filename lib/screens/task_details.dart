@@ -41,7 +41,6 @@ class TaskDetailsState extends State<TaskDetails> {
         .of(context)
         .textTheme
         .title;
-
         
     if (_projectList == null) {
       _projectList = List<Project>();
@@ -189,15 +188,15 @@ class TaskDetailsState extends State<TaskDetails> {
         setState(() {
           this._projectList = projectList;
           this._dropdownMenuItems = _buildDropdownMenuItems(projectList);
-          /*this.projectControllers = List<TextEditingController>();
-
-          for (int i = 0; i < this.projectList.length; i++) {
-            this.projectControllers.add(TextEditingController(
-                text: projectList[i].title != null
-                    ? projectList[i].title
-                    : "",
-            ));
-          }*/
+          this._selectedProject = this._projectList[0];
+          if (this._task.projectId >= 0) {
+            for (Project project in _projectList) {
+              if (project.projectId == this._task.projectId) {
+                this._selectedProject = project;
+                break;
+              }
+            }
+          }
         });
       });
     });
