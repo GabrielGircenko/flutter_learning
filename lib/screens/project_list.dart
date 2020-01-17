@@ -40,70 +40,68 @@ class ProjectListState extends State<ProjectList> {
         ),
         body: Form(
             key: _formKey,
-            child: Padding(
-                padding: EdgeInsets.all(16),
-                child: ListView.builder(
-                    itemCount: _getProjectListCount(),
-                    itemBuilder: (BuildContext context, int position) {
-                      return Card(
-                          color: Colors.white,
-                          elevation: 2,
-                          child: ListTile(
-                              leading: CircleAvatar(
-                                  backgroundColor:
-                                      VisualHelper.getPriorityColor(this
-                                          .projectList[position]
-                                          .projectId),
-                                  child: VisualHelper.getPriorityIcon(
-                                      this.projectList[position].projectId)),
-                              title: TextFormField(
-                                  controller: projectControllers[position],
-                                  validator: (String value) {
-                                    if (value.isEmpty) {
-                                      return "Please enter the project title.";
+            child: ListView.builder(
+                  itemCount: _getProjectListCount(),
+                  itemBuilder: (BuildContext context, int position) {
+                    return Card(
+                        color: Colors.white,
+                        elevation: 2,
+                        child: ListTile(
+                            leading: CircleAvatar(
+                                backgroundColor:
+                                    VisualHelper.getPriorityColor(this
+                                        .projectList[position]
+                                        .projectId),
+                                child: VisualHelper.getPriorityIcon(
+                                    this.projectList[position].projectId)),
+                            title: TextFormField(
+                                controller: projectControllers[position],
+                                validator: (String value) {
+                                  if (value.isEmpty) {
+                                    return "Please enter the project title.";
 
-                                    } else {
-                                      debugPrint(
-                                          "Something changed in Title Text Field");
-                                      updateTitle(position);
-                                    }
-                                  },
-                                  onFieldSubmitted: (_) => _save(position)),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,         
-                                children: <Widget>[
-                                  GestureDetector(
-                                    child: Icon(
-                                      Icons.arrow_upward,
-                                      color: Colors.grey,
-                                    ),
-                                    onTap: () {
-                                      _reorder(context, this.projectList[position], MovementType.moveUp);
-                                    },
+                                  } else {
+                                    debugPrint(
+                                        "Something changed in Title Text Field");
+                                    updateTitle(position);
+                                  }
+                                },
+                                onFieldSubmitted: (_) => _save(position)),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,         
+                              children: <Widget>[
+                                GestureDetector(
+                                  child: Icon(
+                                    Icons.arrow_upward,
+                                    color: Colors.grey,
                                   ),
-                                  GestureDetector(
-                                    child: Icon(
-                                      Icons.arrow_downward,
-                                      color: Colors.grey,
-                                    ),
-                                    onTap: () {
-                                      _reorder(context, this.projectList[position], MovementType.moveDown);
-                                    },
-                                  ),
-                                  GestureDetector(
-                                    child: Icon(
-                                      Icons.delete,
-                                      color: Colors.grey,
-                                    ),
-                                    onTap: () {
-                                      _delete(context, this.projectList[position]);
-                                    },
-                                  ),
-                                  ]),
                                   onTap: () {
-                                    debugPrint("Project Tapped");
-                                  }));
-                    }))));
+                                    _reorder(context, this.projectList[position], MovementType.moveUp);
+                                  },
+                                ),
+                                GestureDetector(
+                                  child: Icon(
+                                    Icons.arrow_downward,
+                                    color: Colors.grey,
+                                  ),
+                                  onTap: () {
+                                    _reorder(context, this.projectList[position], MovementType.moveDown);
+                                  },
+                                ),
+                                GestureDetector(
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: Colors.grey,
+                                  ),
+                                  onTap: () {
+                                    _delete(context, this.projectList[position]);
+                                  },
+                                ),
+                                ]),
+                                onTap: () {
+                                  debugPrint("Project Tapped");
+                                }));
+                  })));
   }
 
   void _delete(BuildContext context, Project project) async {
