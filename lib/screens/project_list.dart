@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_learning/enums/movementType.dart';
 import 'package:flutter_learning/models/project.dart';
-import 'package:flutter_learning/utils/task_list_getter_old.dart';
+import 'package:flutter_learning/utils/list_generator_helper.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
@@ -42,68 +42,10 @@ class ProjectListState extends State<ProjectList> with ActionsInterface<Project>
         ),
         body: Form(
             key: _formKey,
-            child: getKeepLikeListView(this, projectList, _getProjectListCount(), projectControllers)/* ListView.builder(
-                  itemCount: _getProjectListCount(),
-                  itemBuilder: (BuildContext context, int position) {
-                    return Card(
-                        color: Colors.white,
-                        elevation: 2,
-                        child: ListTile(
-                            leading: CircleAvatar(
-                                backgroundColor:
-                                    VisualHelper.getProjectColor(this
-                                        .projectList[position]
-                                        .projectId),
-                                child: VisualHelper.getProjectIcon(
-                                    this.projectList[position].projectId)),
-                            title: TextFormField(
-                                controller: projectControllers[position],
-                                validator: (String value) {
-                                  if (value.isEmpty) {
-                                    return "Please enter the project title.";
-
-                                  } else {
-                                    debugPrint(
-                                        "Something changed in Title Text Field");
-                                    updateTitle(position);
-                                  }
-                                },
-                                onFieldSubmitted: (_) => _save(position)),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,         
-                              children: <Widget>[
-                                GestureDetector(
-                                  child: Icon(
-                                    Icons.arrow_upward,
-                                    color: Colors.grey,
-                                  ),
-                                  onTap: () {
-                                    _reorder(context, this.projectList[position], MovementType.moveUp);
-                                  },
-                                ),
-                                GestureDetector(
-                                  child: Icon(
-                                    Icons.arrow_downward,
-                                    color: Colors.grey,
-                                  ),
-                                  onTap: () {
-                                    _reorder(context, this.projectList[position], MovementType.moveDown);
-                                  },
-                                ),
-                                GestureDetector(
-                                  child: Icon(
-                                    Icons.delete,
-                                    color: Colors.grey,
-                                  ),
-                                  onTap: () {
-                                    _delete(context, this.projectList[position]);
-                                  },
-                                ),
-                                ]),
-                                onTap: () {
-                                  debugPrint("Project Tapped");
-                                }));
-                  })*/));
+            child: getKeepLikeListView(this, 
+              projectList, _getProjectListCount(), projectControllers)
+          )
+        );
   }
 
   void delete(BuildContext context, Project project) async {

@@ -5,44 +5,7 @@ import 'package:flutter_learning/models/task.dart';
 import 'package:flutter_learning/screens/actions_interface.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
 
-ListView getTaskListViewOld(BuildContext context, int taskCount, List<Task> taskList) {
-    TextStyle titleStyle = Theme.of(context).textTheme.subhead;
-
-    return ListView.builder(
-        itemCount: taskCount,
-        itemBuilder: (BuildContext context, int position) {
-          return Card(
-            color: Colors.white,
-            elevation: 2,
-            child: ListTile(
-              leading: CircleAvatar(
-                  backgroundColor:
-                      VisualHelper.getProjectColor(taskList[position].projectId),
-                  child: VisualHelper.getProjectIcon(taskList[position].projectId)),
-              title: Text(
-                taskList[position].title,
-                style: titleStyle,
-              ),
-              subtitle: Text(taskList[position].date),
-              trailing: GestureDetector(
-                  child: Icon(
-                Icons.delete,
-                color: Colors.grey,
-              ),
-              onTap: () {
-                    // TODO _delete(context, taskList[position]);
-              },
-              ),
-              onTap: () {
-                debugPrint("ListTile Tapped");
-                // TODO navigateToTaskDetails(taskList[position], "Edit Task");
-              },
-            ),
-          );
-        });
-  }
-
-  ListView getKeepLikeListView<T extends AbsWithProjectId>(ActionsInterface callback, List<T> list, int itemCount, List<TextEditingController> itemControllers) {
+ListView getKeepLikeListView<T extends AbsWithProjectId>(ActionsInterface callback, List<T> list, int itemCount, List<TextEditingController> itemControllers) {
     return ListView.builder(
                   itemCount: itemCount,
                   itemBuilder: (BuildContext context, int position) {
@@ -106,4 +69,39 @@ ListView getTaskListViewOld(BuildContext context, int taskCount, List<Task> task
                   });
   }
 
-  void doNothing() {}
+ListView getTaskListViewOld(BuildContext context, int taskCount, List<Task> taskList) {
+    TextStyle titleStyle = Theme.of(context).textTheme.subhead;
+
+    return ListView.builder(
+        itemCount: taskCount,
+        itemBuilder: (BuildContext context, int position) {
+          return Card(
+            color: Colors.white,
+            elevation: 2,
+            child: ListTile(
+              leading: CircleAvatar(
+                  backgroundColor:
+                      VisualHelper.getProjectColor(taskList[position].projectId),
+                  child: VisualHelper.getProjectIcon(taskList[position].projectId)),
+              title: Text(
+                taskList[position].title,
+                style: titleStyle,
+              ),
+              subtitle: Text(taskList[position].date),
+              trailing: GestureDetector(
+                  child: Icon(
+                Icons.delete,
+                color: Colors.grey,
+              ),
+              onTap: () {
+                    // TODO _delete(context, taskList[position]);
+              },
+              ),
+              onTap: () {
+                debugPrint("ListTile Tapped");
+                // TODO navigateToTaskDetails(taskList[position], "Edit Task");
+              },
+            ),
+          );
+        });
+  }

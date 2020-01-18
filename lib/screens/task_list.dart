@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_learning/models/project.dart';
+import 'package:flutter_learning/screens/actions_interface.dart';
 import 'package:flutter_learning/screens/project_list.dart';
+import 'package:flutter_learning/utils/list_generator_helper.dart';
 import 'package:sqflite/sqflite.dart';
 import 'task_details.dart';
 import 'dart:async';
 import 'package:flutter_learning/utils/database_helper.dart';
 import 'package:flutter_learning/models/task.dart';
-import 'package:flutter_learning/utils/visual_helper.dart';
 
 class TaskList extends StatefulWidget {
   @override
@@ -15,10 +16,11 @@ class TaskList extends StatefulWidget {
   }
 }
 
-class TaskListState extends State<TaskList> {
+class TaskListState extends State<TaskList> with ActionsInterface<Project> {
   DatabaseHelper databaseHelper = DatabaseHelper();
   List<Task> taskList;
   List<Project> projectList;
+  List<TextEditingController> taskControllers;
   int taskCount = 0;
   int projectCount = 0;
 
@@ -44,7 +46,7 @@ class TaskListState extends State<TaskList> {
           },)
         ],
       ),
-      body: getTaskListView(),
+      body: getKeepLikeListView(this, taskList, taskCount, taskControllers),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           debugPrint("FAB clicked");
@@ -54,43 +56,6 @@ class TaskListState extends State<TaskList> {
         child: Icon(Icons.add),
       ),
     );
-  }
-
-  ListView getTaskListView() {
-    TextStyle titleStyle = Theme.of(context).textTheme.subhead;
-
-    return ListView.builder(
-        itemCount: taskCount,
-        itemBuilder: (BuildContext context, int position) {
-          return Card(
-            color: Colors.white,
-            elevation: 2,
-            child: ListTile(
-              leading: CircleAvatar(
-                  backgroundColor:
-                      VisualHelper.getProjectColor(this.taskList[position].projectId),
-                  child: VisualHelper.getProjectIcon(this.taskList[position].projectId)),
-              title: Text(
-                this.taskList[position].title,
-                style: titleStyle,
-              ),
-              subtitle: Text(this.taskList[position].date),
-              trailing: GestureDetector(
-                  child: Icon(
-                Icons.delete,
-                color: Colors.grey,
-              ),
-              onTap: () {
-                    _delete(context, this.taskList[position]);
-              },
-              ),
-              onTap: () {
-                debugPrint("ListTile Tapped");
-                navigateToTaskDetails(this.taskList[position], "Edit Note");
-              },
-            ),
-          );
-        });
   }
 
   void _delete(BuildContext context, Task task) async {
@@ -135,7 +100,16 @@ class TaskListState extends State<TaskList> {
       taskListFuture.then((taskList) {
         setState(() {
           this.taskList = taskList;
+          this.taskControllers = List<TextEditingController>();
+
           this.taskCount = taskList.length;
+          for (int i = 0; i < this.taskList.length; i++) {
+            this.taskControllers.add(TextEditingController(
+                text: taskList[i].title != null
+                    ? taskList[i].title
+                    : "",
+            ));
+          }
         });
       });
     });
