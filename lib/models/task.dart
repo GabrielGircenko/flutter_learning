@@ -1,17 +1,17 @@
+import 'package:flutter_learning/models/project_id.dart';
 import 'package:flutter_learning/utils/database_helper.dart';
 
-class Task {
+class Task extends ProjectId {
   int _id;
   String _title;
   String _description;
   String _date;
   int _taskPosition;
-  int _projectId = -1;
   int _projectPosition = -1;
 
-  Task(this._title, this._date, this._projectId, this._projectPosition, [this._description]);
+  Task(this._title, this._date, projectIdProtected, this._projectPosition, [this._description]);
 
-  Task.withId(this._id, this._title, this._date, this._projectId, this._projectPosition,
+  Task.withId(this._id, this._title, this._date, projectIdProtected, this._projectPosition,
       [this._description]);
 
   int get id => _id;
@@ -21,8 +21,6 @@ class Task {
   String get description => _description;
 
   int get taskPosition => _taskPosition;
-
-  int get projectId => _projectId;
 
   int get projectPosition => _projectPosition;
 
@@ -44,8 +42,8 @@ class Task {
     this._taskPosition = position;
   }
 
-  set projectId(int newPriority) {
-    this._projectId = newPriority;
+  set projectId(int newProjectId) {
+    this.projectIdProtected = newProjectId;
   }
 
   set date(String newDate) {
@@ -59,7 +57,7 @@ class Task {
 
     map[DatabaseHelper.colTitle] = _title;
     map[DatabaseHelper.colDescription] = _description;
-    map[DatabaseHelper.colProjectId] = _projectId;
+    map[DatabaseHelper.colProjectId] = projectIdProtected;
     map[DatabaseHelper.colDate] = _date;
 
     return map;
@@ -69,7 +67,7 @@ class Task {
     this._id = map[DatabaseHelper.colTaskId];
     this._title = map[DatabaseHelper.colTitle];
     this._description = map[DatabaseHelper.colDescription];
-    this._projectId = map[DatabaseHelper.colProjectId];
+    this.projectIdProtected = map[DatabaseHelper.colProjectId];
     this._date = map[DatabaseHelper.colDate];
   }
 }

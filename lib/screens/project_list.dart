@@ -49,10 +49,10 @@ class ProjectListState extends State<ProjectList> {
                         child: ListTile(
                             leading: CircleAvatar(
                                 backgroundColor:
-                                    VisualHelper.getPriorityColor(this
+                                    VisualHelper.getProjectColor(this
                                         .projectList[position]
                                         .projectId),
-                                child: VisualHelper.getPriorityIcon(
+                                child: VisualHelper.getProjectIcon(
                                     this.projectList[position].projectId)),
                             title: TextFormField(
                                 controller: projectControllers[position],

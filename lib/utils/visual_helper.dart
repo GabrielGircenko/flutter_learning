@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 class VisualHelper {
 
   // Returns the priority color
-  static Color getPriorityColor(int priority) {
-    switch (priority) {
+  static Color getProjectColor(int projectId) {
+    switch (projectId) {
       case 1:
         return Colors.red;
 
@@ -19,9 +19,11 @@ class VisualHelper {
     }
   }
 
+  // TODO Maybe unnceccesary if everything is done in the getProjectColor
   // Returns the priority icon
-  static Icon getPriorityIcon(int priority) {
-    switch (priority) {
+  static Icon getProjectIcon(int projectId) {
+    return Icon(Icons.keyboard_arrow_right);
+    /*switch (projectId) {
       case 1:
       case 2:
       case 3:
@@ -29,7 +31,7 @@ class VisualHelper {
 
       default:
         return Icon(Icons.keyboard_arrow_right);
-    }
+    }*/
   }
 
   static void showAlertDialog(BuildContext context, String title, String message) {

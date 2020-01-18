@@ -1,17 +1,14 @@
+import 'package:flutter_learning/models/project_id.dart';
 import 'package:flutter_learning/utils/database_helper.dart';
 
-class Project {
-  int _projectId;
+class Project extends ProjectId {
+
   int _projectPosition;
   String _title;
 
-  //Project(this._title);
-
   Project.withTitleAndPosition(this._title, this._projectPosition);
 
-  Project.withId(this._projectId, this._title);
-
-  int get projectId => _projectId;
+  Project.withId(projectIdProtected, this._title);
 
   int get projectPosition => _projectPosition;
 
@@ -26,7 +23,7 @@ class Project {
   Map<String, dynamic> toMap() {
     var map = Map<String, dynamic>();
 
-    if (projectId != null) map[DatabaseHelper.colProjectId] = _projectId;
+    if (projectId != null) map[DatabaseHelper.colProjectId] = projectIdProtected;
     if (_projectPosition != null) map[DatabaseHelper.colProjectPosition] = _projectPosition;
 
     map[DatabaseHelper.colProjectTitle] = _title;
@@ -35,7 +32,7 @@ class Project {
   }
 
   Project.fromMapObject(Map<String, dynamic> map) {
-    this._projectId = map[DatabaseHelper.colProjectId];
+    this.projectIdProtected = map[DatabaseHelper.colProjectId];
     this._projectPosition = map[DatabaseHelper.colProjectPosition];
     this._title = map[DatabaseHelper.colProjectTitle];
   }
