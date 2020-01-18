@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_learning/enums/movementType.dart';
+import 'package:flutter_learning/enums/movement_type.dart';
 import 'package:flutter_learning/models/project_id.dart';
 import 'package:flutter_learning/models/task.dart';
 import 'package:flutter_learning/screens/actions_interface.dart';

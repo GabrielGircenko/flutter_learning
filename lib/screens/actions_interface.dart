@@ -1,4 +1,4 @@
-import 'package:flutter_learning/enums/movementType.dart';
+import 'package:flutter_learning/enums/movement_type.dart';
 import 'package:flutter_learning/models/project_id.dart';
 import 'package:flutter/material.dart';
 

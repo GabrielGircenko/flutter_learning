@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_learning/enums/task_list_type.dart';
 import 'package:flutter_learning/models/project.dart';
 import 'package:flutter_learning/screens/project_list.dart';
 import 'package:flutter_learning/screens/task_list_abs.dart';
 import 'package:flutter_learning/utils/list_generator_helper.dart';
 import 'package:flutter_learning/models/task.dart';
+import 'package:sqflite/sqflite.dart';
 
 class Home extends TaskListAbs {
   @override
@@ -48,5 +50,27 @@ class HomeState extends TaskListAbsState {
     if (result != null) {
       updateTaskListView();
     }
+  }
+
+  void updateTaskListView() {
+    final Future<Database> dbFuture = databaseHelper.initializeDatabase();
+    dbFuture.then((database) {
+      Future<List<Task>> taskListFuture = databaseHelper.getTaskList(TaskListType.Home, -1);
+      taskListFuture.then((taskList) {
+        setState(() {
+          this.taskList = taskList;
+          this.taskControllers = List<TextEditingController>();
+
+          this.taskCount = taskList.length;
+          for (int i = 0; i < this.taskList.length; i++) {
+            this.taskControllers.add(TextEditingController(
+                text: taskList[i].title != null
+                    ? taskList[i].title
+                    : "",
+            ));
+          }
+        });
+      });
+    });
   }
 }

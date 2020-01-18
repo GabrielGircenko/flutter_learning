@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_learning/enums/movementType.dart';
+import 'package:flutter_learning/enums/movement_type.dart';
 import 'package:flutter_learning/models/project.dart';
 import 'package:flutter_learning/utils/list_generator_helper.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';

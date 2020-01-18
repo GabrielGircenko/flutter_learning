@@ -1,4 +1,5 @@
-import 'package:flutter_learning/enums/movementType.dart';
+import 'package:flutter_learning/enums/movement_type.dart';
+import 'package:flutter_learning/enums/task_list_type.dart';
 import 'package:flutter_learning/models/project.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
@@ -140,16 +141,24 @@ class DatabaseHelper {
   }
 
   // Fetch Operation: Get all task objects from database
-  Future<List<Map<String, dynamic>>> getTaskMapList() async {
+  Future<List<Map<String, dynamic>>> getHomeTaskMapList() async {
     Database db = await this.database;
 
     // TODO Use INNER JOIN after setting taskPositions in a separate screen
-    var result = await db.rawQuery("SELECT $_taskTable.*, $_projectTable.$colProjectPosition as projectPosition "
+    return await db.rawQuery("SELECT $_taskTable.*, $_projectTable.$colProjectPosition as projectPosition "
       "FROM $_taskTable "
       "JOIN $_projectTable ON $_taskTable.$colProjectId = $_projectTable.$colProjectId "
       "order by $_projectTable.$colProjectPosition ASC");
+  }
 
-    return result;
+  // Fetch Operation: Get all task objects from database
+  Future<List<Map<String, dynamic>>> getTaskMapListInsideAProject(int projectId) async {
+    Database db = await this.database;
+
+    return await db.rawQuery("SELECT * "
+      "FROM $_taskTable "
+      "WHERE $colProjectId = $projectId"
+      "order by $colTaskPosition ASC");
   }
 
   // Insert Operation: Insert a Task object to database
@@ -182,8 +191,16 @@ class DatabaseHelper {
 
   // TODO Order by colProjectPosition
   // Get the 'Map List' [ List<Map> ] and convert it to 'Task List' [ List<Task> ]
-  Future<List<Task>> getTaskList() async {
-    var taskMapList = await getTaskMapList(); // Get 'Map List' from database
+  // projectId is ignored in case of Home task list
+  Future<List<Task>> getTaskList(TaskListType type, int projectId) async {
+    var taskMapList; // Get 'Map List' from database
+    if (type == TaskListType.Home) {
+      taskMapList = await getHomeTaskMapList();
+
+    } else {
+      taskMapList = await getTaskMapListInsideAProject(projectId);
+    }
+
     int count =
         taskMapList.length; // Count the number of map entries in db table
 
