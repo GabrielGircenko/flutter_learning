@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_learning/screens/task_list.dart';
+import 'package:flutter_learning/screens/home.dart';
 
 double _padding = 16;
 double _halfPadding = 8;
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepPurple
       ),
-      home: TaskList(),
+      home: Home(),
     );
   }
 }
