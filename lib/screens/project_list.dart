@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_learning/enums/movementType.dart';
 import 'package:flutter_learning/models/project.dart';
+import 'package:flutter_learning/utils/task_list_getter_old.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'package:flutter_learning/utils/database_helper.dart';
+import 'actions_interface.dart';
 
 class ProjectList extends StatefulWidget {
   @override
@@ -13,7 +15,7 @@ class ProjectList extends StatefulWidget {
   }
 }
 
-class ProjectListState extends State<ProjectList> {
+class ProjectListState extends State<ProjectList> with ActionsInterface<Project> {
   DatabaseHelper databaseHelper = DatabaseHelper();
   List<Project> projectList;
   List<TextEditingController> projectControllers;
@@ -40,7 +42,7 @@ class ProjectListState extends State<ProjectList> {
         ),
         body: Form(
             key: _formKey,
-            child: ListView.builder(
+            child: getKeepLikeListView(this, projectList, _getProjectListCount(), projectControllers)/* ListView.builder(
                   itemCount: _getProjectListCount(),
                   itemBuilder: (BuildContext context, int position) {
                     return Card(
@@ -101,10 +103,10 @@ class ProjectListState extends State<ProjectList> {
                                 onTap: () {
                                   debugPrint("Project Tapped");
                                 }));
-                  })));
+                  })*/));
   }
 
-  void _delete(BuildContext context, Project project) async {
+  void delete(BuildContext context, Project project) async {
     int result = await databaseHelper.deleteProject(project.projectId);
     if (result != 0) {
       _showSnackBar(context, "Project Deleted Successfully");
@@ -112,7 +114,7 @@ class ProjectListState extends State<ProjectList> {
     }
   }
 
-  void _reorder(BuildContext context, Project project, MovementType movementType) async {
+  void reorder(BuildContext context, Project project, MovementType movementType) async {
     int result = await databaseHelper.reorderProject(project.projectPosition, movementType);
     if (result != 0) {
       _showSnackBar(context, "Project Moved Successfully");
@@ -154,7 +156,7 @@ class ProjectListState extends State<ProjectList> {
   }
 
   // Save data to database
-  void _save(int position) async {
+  void save(int position) async {
     if (_formKey.currentState.validate()) {
       int result;
       if (projectList[position] != null && projectList[position].projectId != null) {
@@ -202,7 +204,7 @@ class ProjectListState extends State<ProjectList> {
 
   void _addBlankProject() {
     projectList.add(new Project.withTitleAndPosition("", projectList.length));
-    _save(projectList.length - 1);
+    save(projectList.length - 1);
     updateProjectListView();
   }
 

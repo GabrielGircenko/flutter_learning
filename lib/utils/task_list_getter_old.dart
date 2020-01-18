@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_learning/enums/movementType.dart';
 import 'package:flutter_learning/models/project_id.dart';
 import 'package:flutter_learning/models/task.dart';
+import 'package:flutter_learning/screens/actions_interface.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
 
 ListView getTaskListViewOld(BuildContext context, int taskCount, List<Task> taskList) {
@@ -41,7 +42,7 @@ ListView getTaskListViewOld(BuildContext context, int taskCount, List<Task> task
         });
   }
 
-  ListView getKeepLikeListView<T extends ProjectId>(List<T> list, int itemCount, List<TextEditingController> itemControllers) {
+  ListView getKeepLikeListView<T extends AbsWithProjectId>(ActionsInterface callback, List<T> list, int itemCount, List<TextEditingController> itemControllers) {
     return ListView.builder(
                   itemCount: itemCount,
                   itemBuilder: (BuildContext context, int position) {
@@ -64,10 +65,10 @@ ListView getTaskListViewOld(BuildContext context, int taskCount, List<Task> task
                                   } else {
                                     debugPrint(
                                         "Something changed in Title Text Field");
-                                    // TODO updateTitle(position);
+                                    callback.updateTitle(position);
                                   }
                                 },
-                                onFieldSubmitted: (_) => DoNothingAction()), // TODO (_) => _save(position)),
+                                onFieldSubmitted: (_) => callback.save(position)),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,         
                               children: <Widget>[
@@ -77,7 +78,7 @@ ListView getTaskListViewOld(BuildContext context, int taskCount, List<Task> task
                                     color: Colors.grey,
                                   ),
                                   onTap: () {
-                                    // TODO _reorder(context, list[position], MovementType.moveUp);
+                                    callback.reorder(context, list[position], MovementType.moveUp);
                                   },
                                 ),
                                 GestureDetector(
@@ -86,7 +87,7 @@ ListView getTaskListViewOld(BuildContext context, int taskCount, List<Task> task
                                     color: Colors.grey,
                                   ),
                                   onTap: () {
-                                    // TODO _reorder(context, list[position], MovementType.moveDown);
+                                    callback.reorder(context, list[position], MovementType.moveDown);
                                   },
                                 ),
                                 GestureDetector(
@@ -95,7 +96,7 @@ ListView getTaskListViewOld(BuildContext context, int taskCount, List<Task> task
                                     color: Colors.grey,
                                   ),
                                   onTap: () {
-                                    // TODO _delete(context, list[position]);
+                                    callback.delete(context, list[position]);
                                   },
                                 ),
                                 ]),

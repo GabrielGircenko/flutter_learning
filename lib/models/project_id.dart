@@ -1,7 +1,7 @@
 
 import 'package:meta/meta.dart';
 
-class ProjectId {
+class AbsWithProjectId {
   @protected
   int projectIdProtected = -1;
 

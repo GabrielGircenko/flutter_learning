@@ -1,7 +1,7 @@
 import 'package:flutter_learning/models/project_id.dart';
 import 'package:flutter_learning/utils/database_helper.dart';
 
-class Project extends ProjectId {
+class Project extends AbsWithProjectId {
 
   int _projectPosition;
   String _title;
