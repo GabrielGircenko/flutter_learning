@@ -23,7 +23,6 @@ class ProjectListState extends State<ProjectList> with ActionsInterface<Project>
 
   @override
   Widget build(BuildContext context) {
-    var textStyle = Theme.of(context).textTheme.title;
     if (projectList == null) {
       updateProjectListView();
     }

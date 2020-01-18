@@ -1,98 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_learning/models/project.dart';
 import 'package:flutter_learning/screens/actions_interface.dart';
-import 'package:flutter_learning/screens/project_list.dart';
-import 'package:flutter_learning/utils/list_generator_helper.dart';
 import 'package:sqflite/sqflite.dart';
-import 'task_details.dart';
 import 'dart:async';
 import 'package:flutter_learning/utils/database_helper.dart';
 import 'package:flutter_learning/models/task.dart';
 
-class TaskList extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return TaskListState();
-  }
-}
+abstract class TaskListAbs extends StatefulWidget {}
 
-class TaskListState extends State<TaskList> with ActionsInterface<Project> {
+abstract class TaskListAbsState extends State<TaskListAbs> with ActionsInterface<Task> {
+  @protected
   DatabaseHelper databaseHelper = DatabaseHelper();
+  @protected
   List<Task> taskList;
+  @protected
   List<Project> projectList;
+  @protected
   List<TextEditingController> taskControllers;
+  @protected
   int taskCount = 0;
+  @protected
   int projectCount = 0;
 
-  @override
-  Widget build(BuildContext context) {
-    if (projectList == null) {
-      projectList = List<Project>();
-    }
-
-    if (taskList == null) {
-      taskList = List<Task>();
-      updateTaskListView();
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Tasks"),
-        actions: <Widget>[
-          IconButton(icon: Icon(Icons.settings),
-          tooltip: "Projects",
-          onPressed: () {
-            navigateToProjects();
-          },)
-        ],
-      ),
-      body: getKeepLikeListView(this, taskList, taskCount, taskControllers),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          debugPrint("FAB clicked");
-          navigateToTaskDetails(Task("", "", -1, -1), "Add Task");
-        },
-        tooltip: "Add Task",
-        child: Icon(Icons.add),
-      ),
-    );
-  }
-
-  void _delete(BuildContext context, Task task) async {
+  @protected
+  void delete(BuildContext context, Task task) async {
     int result = await databaseHelper.deleteTask(task.id);
     if (result != 0) {
-      _showSnackBar(context, "Task Deleted Successfully");
+      showSnackBar(context, "Task Deleted Successfully");
       updateTaskListView();
     }
   }
 
-  void _showSnackBar(BuildContext context, String message) {
+  @protected
+  void showSnackBar(BuildContext context, String message) {
     final snackBar = SnackBar(
       content: Text(message),
     );
     Scaffold.of(context).showSnackBar(snackBar);
   }
 
-  void navigateToProjects() async {
-    bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return ProjectList();
-    }));
-
-    if (result != null) {
-      updateTaskListView();
-    }
-  }
-
-  void navigateToTaskDetails(Task note, String title) async {
-    bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return TaskDetails(note, title);
-    }));
-
-    if (result) {
-      updateTaskListView();
-    }
-  }
-
+  @protected
   void updateTaskListView() {
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();
     dbFuture.then((database) {
