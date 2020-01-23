@@ -65,6 +65,7 @@ ListView getKeepLikeListView<T extends AbsWithProjectId>(ActionsInterface callba
                                 ]),
                                 onTap: () {
                                   debugPrint("List Item Tapped");
+                                  callback.itemClicked(position);
                                 }));
                   });
   }

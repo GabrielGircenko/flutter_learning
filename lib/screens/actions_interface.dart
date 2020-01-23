@@ -7,4 +7,5 @@ mixin ActionsInterface<T extends AbsWithProjectId> {
   void updateTitle(int position) {}
   void delete(BuildContext context, T model) {}
   void reorder(BuildContext context, T model, MovementType movementType) {}
+  void itemClicked(int position) {}
 } 

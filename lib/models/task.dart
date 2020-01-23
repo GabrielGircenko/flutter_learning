@@ -2,7 +2,7 @@ import 'package:flutter_learning/models/project_id.dart';
 import 'package:flutter_learning/utils/database_helper.dart';
 
 class Task extends AbsWithProjectId {
-  int _id;
+  int _taskId;
   String _title;
   String _description;
   String _date;
@@ -11,10 +11,10 @@ class Task extends AbsWithProjectId {
 
   Task(this._title, this._date, projectIdProtected, this._projectPosition, [this._description]);
 
-  Task.withId(this._id, this._title, this._date, projectIdProtected, this._projectPosition,
+  Task.withId(this._taskId, this._title, this._date, projectIdProtected, this._projectPosition,
       [this._description]);
 
-  int get id => _id;
+  int get taskId => _taskId;
 
   String get title => _title;
 
@@ -53,7 +53,7 @@ class Task extends AbsWithProjectId {
   Map<String, dynamic> toMap() {
     var map = Map<String, dynamic>();
 
-    if (id != null) map[DatabaseHelper.colTaskId] = _id;
+    if (taskId != null) map[DatabaseHelper.colTaskId] = _taskId;
 
     map[DatabaseHelper.colTitle] = _title;
     map[DatabaseHelper.colDescription] = _description;
@@ -64,7 +64,7 @@ class Task extends AbsWithProjectId {
   }
 
   Task.fromMapObject(Map<String, dynamic> map) {
-    this._id = map[DatabaseHelper.colTaskId];
+    this._taskId = map[DatabaseHelper.colTaskId];
     this._title = map[DatabaseHelper.colTitle];
     this._description = map[DatabaseHelper.colDescription];
     this.projectIdProtected = map[DatabaseHelper.colProjectId];

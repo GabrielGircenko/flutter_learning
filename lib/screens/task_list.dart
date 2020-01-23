@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_learning/enums/movement_type.dart';
 import 'package:flutter_learning/enums/task_list_type.dart';
 import 'package:flutter_learning/models/project.dart';
 import 'package:flutter_learning/models/task.dart';
@@ -8,13 +9,24 @@ import 'package:flutter_learning/utils/list_generator_helper.dart';
 import 'package:sqflite/sqflite.dart';
 
 class TaskList extends TaskListAbs {
+  
+  final String appBarTitle;
+  final Project project;
+  
+  TaskList(this.project, this.appBarTitle);
+
   @override
   State<StatefulWidget> createState() {
-    return TaskListState();
+    return TaskListState(this.project, this.appBarTitle);
   }
 }
 
 class TaskListState extends TaskListAbsState {
+  
+  String appBarTitle;
+  Project project;
+
+  TaskListState(this.project, this.appBarTitle);
   
   @override
   Widget build(BuildContext context) {
@@ -29,18 +41,26 @@ class TaskListState extends TaskListAbsState {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Tasks"), // TODO Add Project name here
+        title: Text(appBarTitle),
       ),
       body: getKeepLikeListView(this, taskList, taskCount, taskControllers),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           debugPrint("FAB clicked");
-          navigateToTaskDetails(Task("", "", -1, -1), "Add Task");
+          navigateToTaskDetails(Task("", "", project.projectId, project.projectPosition), "Add Task");
         },
         tooltip: "Add Task",
         child: Icon(Icons.add),
       ),
     );
+  }
+
+  void reorder(BuildContext context, Task task, MovementType movementType) async {
+    int result = await databaseHelper.reorderTask(task.projectId, task.taskPosition, movementType);
+    if (result != 0) {
+      showSnackBar(context, "Task Moved Successfully");
+      updateTaskListView();
+    }
   }
 
   void navigateToTaskDetails(Task note, String title) async {
@@ -56,7 +76,7 @@ class TaskListState extends TaskListAbsState {
   void updateTaskListView() {
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();
     dbFuture.then((database) {
-      Future<List<Task>> taskListFuture = databaseHelper.getTaskList(TaskListType.InAProject, -1);  // TODO Update projectId
+      Future<List<Task>> taskListFuture = databaseHelper.getTaskList(TaskListType.InAProject, project.projectId);  // TODO Update projectId
       taskListFuture.then((taskList) {
         setState(() {
           this.taskList = taskList;

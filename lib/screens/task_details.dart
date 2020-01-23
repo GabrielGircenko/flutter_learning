@@ -237,7 +237,7 @@ class TaskDetailsState extends State<TaskDetails> {
 
       _task.date = DateFormat.yMMMd().format(DateTime.now());
       int result;
-      if (_task.id != null) {
+      if (_task.taskId != null) {
         // Case 1: Update operation
         result = await databaseHelper.updateTask(_task);
 
@@ -262,13 +262,13 @@ class TaskDetailsState extends State<TaskDetails> {
 
     // Case 1: If user is trying to delete the NEW NOTE i.e. he has come to
     // the detail page by pressing the FAB of NoteList page.
-    if (_task.id == null) {
+    if (_task.taskId == null) {
       VisualHelper.showAlertDialog(context, "Status", "No Note was deleted");
       return;
     }
 
     // Case 2: User is trying to delete the old note that already has a valid ID.
-    int result = await databaseHelper.deleteTask(_task.id);
+    int result = await databaseHelper.deleteTask(_task.taskId);
     if (result != 0) {
       VisualHelper.showAlertDialog(context, "Status", "Note Deleted Successfully");
     } else {

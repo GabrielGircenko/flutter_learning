@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_learning/enums/movement_type.dart';
 import 'package:flutter_learning/models/project.dart';
+import 'package:flutter_learning/utils/screen_with_snackbar.dart';
+import 'package:flutter_learning/screens/task_list.dart';
 import 'package:flutter_learning/utils/list_generator_helper.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
 import 'package:sqflite/sqflite.dart';
@@ -15,7 +17,7 @@ class ProjectList extends StatefulWidget {
   }
 }
 
-class ProjectListState extends State<ProjectList> with ActionsInterface<Project> {
+class ProjectListState extends State<ProjectList> with ActionsInterface<Project>, ScreenWithSnackbar {
   DatabaseHelper databaseHelper = DatabaseHelper();
   List<Project> projectList;
   List<TextEditingController> projectControllers;
@@ -47,10 +49,20 @@ class ProjectListState extends State<ProjectList> with ActionsInterface<Project>
         );
   }
 
+  void itemClicked(int position) async {
+    bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return TaskList(projectList[position], projectList[position].title);
+    }));
+
+    if (result != null) {
+      updateProjectListView();
+    }
+  }
+
   void delete(BuildContext context, Project project) async {
     int result = await databaseHelper.deleteProject(project.projectId);
     if (result != 0) {
-      _showSnackBar(context, "Project Deleted Successfully");
+      showSnackBar(context, "Project Deleted Successfully");
       updateProjectListView();
     }
   }
@@ -58,16 +70,9 @@ class ProjectListState extends State<ProjectList> with ActionsInterface<Project>
   void reorder(BuildContext context, Project project, MovementType movementType) async {
     int result = await databaseHelper.reorderProject(project.projectPosition, movementType);
     if (result != 0) {
-      _showSnackBar(context, "Project Moved Successfully");
+      showSnackBar(context, "Project Moved Successfully");
       updateProjectListView();
     }
-  }
-
-  void _showSnackBar(BuildContext context, String message) {
-    final snackBar = SnackBar(
-      content: Text(message),
-    );
-    Scaffold.of(context).showSnackBar(snackBar);
   }
 
   void updateProjectListView() {
