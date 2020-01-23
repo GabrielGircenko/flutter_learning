@@ -23,7 +23,7 @@ abstract class TaskListAbsState extends State<TaskListAbs> with ActionsInterface
 
   @protected
   void delete(BuildContext context, Task task) async {
-    int result = await databaseHelper.deleteTask(task.taskId);
+    int result = await databaseHelper.deleteTask(task.taskId, task.projectId);
     if (result != 0) {
       showSnackBar(context, "Task Deleted Successfully");
       updateTaskListView();

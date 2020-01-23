@@ -7,13 +7,13 @@ class Task extends AbsWithProjectId {
   String _description;
   String _date;
   int _taskPosition;
-  int _projectPosition = -1;
+  int _projectPosition;
 
-  Task(this._title, this._date, projectId, this._projectPosition, [this._description]) {
+  Task(this._title, this._taskPosition, this._date, projectId, this._projectPosition, [this._description]) {
     projectIdProtected = projectId;
   }
 
-  Task.withId(this._taskId, this._title, this._date, projectIdProtected, this._projectPosition,
+  Task.withId(this._taskId, this._taskPosition, this._title, this._date, projectIdProtected, this._projectPosition,
       [this._description])  {
     projectIdProtected = projectId;
   }
@@ -63,6 +63,7 @@ class Task extends AbsWithProjectId {
     map[DatabaseHelper.colDescription] = _description;
     map[DatabaseHelper.colProjectId] = projectIdProtected;
     map[DatabaseHelper.colDate] = _date;
+    map[DatabaseHelper.colTaskPosition] = _taskPosition;
 
     return map;
   }
@@ -73,5 +74,6 @@ class Task extends AbsWithProjectId {
     this._description = map[DatabaseHelper.colDescription];
     this.projectIdProtected = map[DatabaseHelper.colProjectId];
     this._date = map[DatabaseHelper.colDate];
+    this._taskPosition = map[DatabaseHelper.colTaskPosition];
   }
 }

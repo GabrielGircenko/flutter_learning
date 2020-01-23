@@ -12,7 +12,7 @@ class DatabaseHelper {
   static Database _database;
 
   final String _db = "projects.db";   // TODO updateDb renaming database file from notes.db in version 3->4
-  final int _databaseVersion = 4;
+  final int _databaseVersion = 5;
 
   final String _taskTable = "task_table";
   final String _projectTable = "project_table";
@@ -89,7 +89,7 @@ class DatabaseHelper {
   // TODO Test upgrades
   void _upgradeDb(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < newVersion) {
-      if (oldVersion == 1) {
+      if (oldVersion == 1) {  // rename a projectId column inside a task table
         await db.execute(
             "ALTER TABLE $_taskTableV1 RENAME TO $_taskTableOld;");
 
@@ -105,7 +105,7 @@ class DatabaseHelper {
             "SELECT $_colProjectIdV1 "
             "FROM $_taskTableOld;");
 
-      } else if (oldVersion == 2) {
+      } else if (oldVersion == 2) { // update the name of project table
         await db.execute(
             "ALTER TABLE $_projectTableV3 RENAME TO $_projectTableOld;");
 
@@ -115,7 +115,7 @@ class DatabaseHelper {
             "SELECT $colProjectId, $colProjectTitle "
             "FROM $_projectTableOld;");
 
-      } else if (oldVersion == 3) {
+      } else if (oldVersion == 3) { // update name of the task and project tables
         await db.execute(
             "ALTER TABLE $_taskTableV1 RENAME TO $_taskTableOld;");
 
@@ -133,6 +133,10 @@ class DatabaseHelper {
         await db.execute("INSERT INTO $_projectTable ($colProjectPosition, $colProjectTitle) "
             "SELECT $colProjectIdV3, $colProjectTitle "
             "FROM $_projectTableOld;");
+
+      } else if (oldVersion == 4) { // update colTaskPosition
+        await db.execute("UPDATE $_taskTable "
+            "SET $colTaskPosition = $colTaskId;");
       }
 
       await db.execute("DROP TABLE IF EXISTS $_taskTableOld");
@@ -148,7 +152,7 @@ class DatabaseHelper {
     return await db.rawQuery("SELECT $_taskTable.*, $_projectTable.$colProjectPosition as projectPosition "
       "FROM $_taskTable "
       "JOIN $_projectTable ON $_taskTable.$colProjectId = $_projectTable.$colProjectId "
-      "order by $_projectTable.$colProjectPosition ASC");
+      "order by $_projectTable.$colProjectPosition, $_taskTable.$colTaskPosition;");
   }
 
   // Fetch Operation: Get all task objects from database
@@ -158,7 +162,7 @@ class DatabaseHelper {
     return await db.rawQuery("SELECT * "
       "FROM $_taskTable "
       "WHERE $colProjectId = $projectId "
-      "order by $colTaskPosition ASC");
+      "order by $colTaskPosition;");
   }
 
   // Insert Operation: Insert a Task object to database
@@ -175,10 +179,34 @@ class DatabaseHelper {
         where: "$colTaskId = ?", whereArgs: [task.taskId]);
   }
 
+  // TODO Don't reorder if the task has the highest value of #colTaskId in the table
   // Delete Operation: Delete a Task object from database
-  Future<int> deleteTask(int id) async {
+  Future<int> deleteTask(int taskId, int projectId) async {
     var db = await this.database;
-    return await db.rawDelete("DELETE FROM $_taskTable WHERE $colTaskId = $id");
+    var result = await db.rawDelete("DELETE FROM $_taskTable WHERE $colTaskId = $taskId");
+
+    if (result != 0) {
+      return await _updateTaskPositionsAfterDelete(projectId);
+    
+    } else {
+      return 0;
+    }
+  }
+
+  // TODO Make optimization algorithm which will decide if it's neccessary to reorder positions
+  Future<int> _updateTaskPositionsAfterDelete(int projectId) async {
+    var taskList = await getTaskList(TaskListType.InAProject, projectId);
+    var result = 1;
+
+    var db = await this.database;
+    for (int i = 0; i < taskList.length; i++) {
+      var id = taskList[i].taskId;
+      result *= await db.rawUpdate("UPDATE $_taskTable "
+        "SET $colTaskPosition = $i "
+        "WHERE $colTaskId = $id;");
+    }
+
+    return result;
   }
 
   // Get number of Task objects in database
@@ -311,7 +339,7 @@ class DatabaseHelper {
             "SET $colTaskPosition = $taskPosition-1 WHERE $colTaskId = $id1");
 
         var id2 = taskList[taskPosition - 1].taskId;
-        result *= await db.rawUpdate("UPDATE $_projectTable " 
+        result *= await db.rawUpdate("UPDATE $_taskTable " 
             "SET $colTaskPosition = $taskPosition WHERE $colTaskId = $id2");
 
       } else {
@@ -348,7 +376,7 @@ class DatabaseHelper {
   // Fetch Operation: Get all priority objects from database
   Future<List<Map<String, dynamic>>> getProjectMapList() async {
     Database db = await this.database;
-    var result = await db.query(_projectTable, orderBy: "$colProjectPosition ASC");
+    var result = await db.query(_projectTable, orderBy: "$colProjectPosition");
     return result;
   }
 

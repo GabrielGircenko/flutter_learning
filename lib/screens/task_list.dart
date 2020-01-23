@@ -47,7 +47,7 @@ class TaskListState extends TaskListAbsState {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           debugPrint("FAB clicked");
-          navigateToTaskDetails(Task("", "", project.projectId, project.projectPosition), "Add Task");
+          navigateToTaskDetails(Task("", taskList.length, "", project.projectId, project.projectPosition), "Add Task");
         },
         tooltip: "Add Task",
         child: Icon(Icons.add),

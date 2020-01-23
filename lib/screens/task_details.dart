@@ -217,7 +217,7 @@ class TaskDetailsState extends State<TaskDetails> {
     }
 
     // Case 2: User is trying to delete the old task that already has a valid ID.
-    int result = await databaseHelper.deleteTask(_task.taskId);
+    int result = await databaseHelper.deleteTask(_task.taskId, _task.projectId);
     if (result != 0) {
       VisualHelper.showAlertDialog(context, "Status", "Task Deleted Successfully");
     } else {
