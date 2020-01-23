@@ -47,9 +47,7 @@ class HomeState extends TaskListAbsState {
       return ProjectList();
     }));
 
-    if (result != null) {
-      updateTaskListView();
-    }
+    updateTaskListView();
   }
 
   void updateTaskListView() {
