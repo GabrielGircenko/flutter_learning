@@ -9,10 +9,14 @@ class Task extends AbsWithProjectId {
   int _taskPosition;
   int _projectPosition = -1;
 
-  Task(this._title, this._date, projectIdProtected, this._projectPosition, [this._description]);
+  Task(this._title, this._date, projectId, this._projectPosition, [this._description]) {
+    projectIdProtected = projectId;
+  }
 
   Task.withId(this._taskId, this._title, this._date, projectIdProtected, this._projectPosition,
-      [this._description]);
+      [this._description])  {
+    projectIdProtected = projectId;
+  }
 
   int get taskId => _taskId;
 

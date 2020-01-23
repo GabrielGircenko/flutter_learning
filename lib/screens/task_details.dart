@@ -4,7 +4,6 @@ import 'package:flutter_learning/utils/database_helper.dart';
 import 'package:flutter_learning/models/task.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
 import 'package:intl/intl.dart';
-import 'package:sqflite/sqlite_api.dart';
 
 class TaskDetails extends StatefulWidget {
   final String appBarTitle;
@@ -26,9 +25,6 @@ class TaskDetailsState extends State<TaskDetails> {
 
   String appBarTitle;
   Task _task;
-  List<Project> _projectList;
-  List<DropdownMenuItem<Project>> _dropdownMenuItems;
-  Project _selectedProject;
 
   var titleController = TextEditingController();
   var descriptionController = TextEditingController();
@@ -41,11 +37,6 @@ class TaskDetailsState extends State<TaskDetails> {
         .of(context)
         .textTheme
         .title;
-        
-    if (_projectList == null) {
-      _projectList = List<Project>();
-      _updateProjectDropdownView();
-    }
 
     titleController.text = _task.title;
     descriptionController.text = _task.description;
@@ -112,14 +103,6 @@ class TaskDetailsState extends State<TaskDetails> {
                     ),
                     Padding(
                       padding: EdgeInsets.only(top: 16),
-                      child: DropdownButton(
-                        value: _selectedProject,
-                        items: _dropdownMenuItems,
-                        onChanged: _onChangedProject,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 16),
                       child: Row(
                         children: <Widget>[
                           Expanded(
@@ -167,39 +150,9 @@ class TaskDetailsState extends State<TaskDetails> {
               )),
         ));
   }
-  
-  void _onChangedProject(Project selectedProject) {
-    setState(() {
-      _selectedProject = selectedProject; 
-      _updateTasksProjectId();
-    });
-  }
 
   void moveToLastScreen() {
     Navigator.pop(context, true);
-  }
-
-  void _updateProjectDropdownView() {
-    final Future<Database> dbFuture = databaseHelper.initializeDatabase();
-    dbFuture.then((database) {
-      Future<List<Project>> projectListFuture =
-          databaseHelper.getProjectList();
-      projectListFuture.then((projectList) {
-        setState(() {
-          this._projectList = projectList;
-          this._dropdownMenuItems = _buildDropdownMenuItems(projectList);
-          this._selectedProject = this._projectList[0];
-          if (this._task.projectId >= 0) {
-            for (Project project in _projectList) {
-              if (project.projectId == this._task.projectId) {
-                this._selectedProject = project;
-                break;
-              }
-            }
-          }
-        });
-      });
-    });
   }
 
   List<DropdownMenuItem<Project>> _buildDropdownMenuItems(List<Project> list) {
@@ -224,10 +177,6 @@ class TaskDetailsState extends State<TaskDetails> {
   // Update the description of Task object
   void updateDescription() {
     _task.description = descriptionController.text;
-  }
-
-  void _updateTasksProjectId() {
-    _task.projectId = _selectedProject.projectId;
   }
 
   // Save data to database
