@@ -149,10 +149,10 @@ class DatabaseHelper {
     Database db = await this.database;
 
     // TODO Use INNER JOIN after setting taskPositions in a separate screen
-    return await db.rawQuery("SELECT $_taskTable.*, $_projectTable.$colProjectPosition as projectPosition "
-      "FROM $_taskTable "
-      "JOIN $_projectTable ON $_taskTable.$colProjectId = $_projectTable.$colProjectId "
-      "order by $_projectTable.$colProjectPosition, $_taskTable.$colTaskPosition;");
+    return await db.rawQuery("SELECT foo.*, $_projectTable.$colProjectPosition as projectPosition "
+      "FROM (SELECT $_taskTable.$colTaskId, $_taskTable.$colTitle, $_taskTable.$colDescription, $_taskTable.$colProjectId, $_taskTable.$colDate, MIN($_taskTable.$colTaskPosition) FROM $_taskTable GROUP BY $_taskTable.$colProjectId) foo "
+      "JOIN $_projectTable ON foo.$colProjectId = $_projectTable.$colProjectId "
+      "order by $_projectTable.$colProjectPosition;");
   }
 
   // Fetch Operation: Get all task objects from database
@@ -241,6 +241,46 @@ class DatabaseHelper {
     return taskList;
   }
 
+  // TODO Finish reorderTask method
+  // Reorder Operation: Reorder a Task object in database
+  Future<int> reorderTask(int projectId, int taskPosition, MovementType movementType) async {
+    var taskList = await getTaskList(TaskListType.InAProject, projectId);
+    var result = 1;
+    
+    if (movementType == MovementType.moveUp) {
+      if (taskPosition - 1 >= 0) {
+        var db = await this.database;
+        var id1 = taskList[taskPosition].taskId;
+        result *= await db.rawUpdate("UPDATE $_taskTable " 
+            "SET $colTaskPosition = $taskPosition-1 WHERE $colTaskId = $id1");
+
+        var id2 = taskList[taskPosition - 1].taskId;
+        result *= await db.rawUpdate("UPDATE $_taskTable " 
+            "SET $colTaskPosition = $taskPosition WHERE $colTaskId = $id2");
+
+      } else {
+        result = 0;
+      } 
+
+    } else {
+      if (taskPosition < taskList.length - 1) {
+        var db = await this.database;
+        var id1 = taskList[taskPosition].taskId;
+        result *= await db.rawUpdate("UPDATE $_taskTable " 
+            "SET $colTaskPosition = $taskPosition+1 WHERE $colTaskId = $id1");
+
+        var id2 = taskList[taskPosition + 1].taskId;
+        result *= await db.rawUpdate("UPDATE $_taskTable " 
+            "SET $colTaskPosition = $taskPosition WHERE $colTaskId = $id2");
+
+      } else {
+        result = 0;
+      }
+    }
+
+    return result;
+  }
+
   // Insert Operation: Insert a Project object to database
   Future<int> insertProject(Project project) async {
     Database db = await this.database;
@@ -316,46 +356,6 @@ class DatabaseHelper {
         var id2 = projectList[projectPosition + 1].projectId;
         result *= await db.rawUpdate("UPDATE $_projectTable " 
             "SET $colProjectPosition = $projectPosition WHERE $colProjectId = $id2");
-
-      } else {
-        result = 0;
-      }
-    }
-
-    return result;
-  }
-
-  // TODO Finish reorderTask method
-  // Reorder Operation: Reorder a Task object in database
-  Future<int> reorderTask(int projectId, int taskPosition, MovementType movementType) async {
-    var taskList = await getTaskList(TaskListType.InAProject, projectId);
-    var result = 1;
-    
-    if (movementType == MovementType.moveUp) {
-      if (taskPosition - 1 >= 0) {
-        var db = await this.database;
-        var id1 = taskList[taskPosition].taskId;
-        result *= await db.rawUpdate("UPDATE $_taskTable " 
-            "SET $colTaskPosition = $taskPosition-1 WHERE $colTaskId = $id1");
-
-        var id2 = taskList[taskPosition - 1].taskId;
-        result *= await db.rawUpdate("UPDATE $_taskTable " 
-            "SET $colTaskPosition = $taskPosition WHERE $colTaskId = $id2");
-
-      } else {
-        result = 0;
-      } 
-
-    } else {
-      if (taskPosition < taskList.length - 1) {
-        var db = await this.database;
-        var id1 = taskList[taskPosition].taskId;
-        result *= await db.rawUpdate("UPDATE $_taskTable " 
-            "SET $colTaskPosition = $taskPosition+1 WHERE $colTaskId = $id1");
-
-        var id2 = taskList[taskPosition + 1].taskId;
-        result *= await db.rawUpdate("UPDATE $_taskTable " 
-            "SET $colTaskPosition = $taskPosition WHERE $colTaskId = $id2");
 
       } else {
         result = 0;
