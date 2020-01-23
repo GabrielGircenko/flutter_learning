@@ -216,12 +216,12 @@ class TaskDetailsState extends State<TaskDetails> {
     return items;
   }
 
-  // Update the title of Note object
+  // Update the title of Task object
   void updateTitle() {
     _task.title = titleController.text;
   }
 
-  // Update the description of Note object
+  // Update the description of Task object
   void updateDescription() {
     _task.description = descriptionController.text;
   }
@@ -248,11 +248,11 @@ class TaskDetailsState extends State<TaskDetails> {
 
       if (result != 0) {
         // Success
-        VisualHelper.showAlertDialog(context, "Status", "Note Saved Successfully");
+        VisualHelper.showAlertDialog(context, "Status", "Task Saved Successfully");
 
       } else {
         // Failure
-        VisualHelper.showAlertDialog(context, "Status", "Problem Saving Note");
+        VisualHelper.showAlertDialog(context, "Status", "Problem Saving A Task");
       }
     }
   }
@@ -260,19 +260,19 @@ class TaskDetailsState extends State<TaskDetails> {
   void _delete() async {
     moveToLastScreen();
 
-    // Case 1: If user is trying to delete the NEW NOTE i.e. he has come to
-    // the detail page by pressing the FAB of NoteList page.
+    // Case 1: If user is trying to delete the NEW TASK i.e. he has come to
+    // the detail page by pressing the FAB of TaskList page.
     if (_task.taskId == null) {
-      VisualHelper.showAlertDialog(context, "Status", "No Note was deleted");
+      VisualHelper.showAlertDialog(context, "Status", "No Task was deleted");
       return;
     }
 
-    // Case 2: User is trying to delete the old note that already has a valid ID.
+    // Case 2: User is trying to delete the old task that already has a valid ID.
     int result = await databaseHelper.deleteTask(_task.taskId);
     if (result != 0) {
-      VisualHelper.showAlertDialog(context, "Status", "Note Deleted Successfully");
+      VisualHelper.showAlertDialog(context, "Status", "Task Deleted Successfully");
     } else {
-      VisualHelper.showAlertDialog(context, "Status", "Error Occured while Deleting Note");
+      VisualHelper.showAlertDialog(context, "Status", "Error Occured while Deleting Task");
     }
   }
 }
