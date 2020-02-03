@@ -43,7 +43,10 @@ class TaskListState extends TaskListAbsState {
       appBar: AppBar(
         title: Text(appBarTitle),
       ),
-      body: getKeepLikeListView(this, taskList, taskCount, taskControllers),
+      body: Form(
+        key: formKey,
+        child: getKeepLikeListView(this, taskList, taskCount, taskControllers)
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           debugPrint("FAB clicked");
@@ -55,6 +58,12 @@ class TaskListState extends TaskListAbsState {
     );
   }
 
+  @override
+  void updateTitle(int position) {
+    taskList[position].title = taskControllers[position].text;
+  }
+
+  @override
   void reorder(BuildContext context, Task task, MovementType movementType) async {
     int result = await databaseHelper.reorderTask(task.projectId, task.taskPosition, movementType);
     if (result != 0) {

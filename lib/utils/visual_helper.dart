@@ -41,4 +41,15 @@ class VisualHelper {
     );
     showDialog(context: context, builder: (_) => alertDialog);
   }
+
+  static void showAlertDialogAfterTaskSaveAttempt(BuildContext context, String title, String message, int result) {
+    if (result != 0) {
+        // Success
+        showAlertDialog(context, "Status", "Task Saved Successfully");
+
+      } else {
+        // Failure
+        showAlertDialog(context, "Status", "Problem Saving A Task");
+      }
+  }
 }

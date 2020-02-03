@@ -49,6 +49,7 @@ class ProjectListState extends State<ProjectList> with ActionsInterface<Project>
         );
   }
 
+  @override
   void itemClicked(int position) async {
     bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
       return TaskList(projectList[position], projectList[position].title);
@@ -59,6 +60,7 @@ class ProjectListState extends State<ProjectList> with ActionsInterface<Project>
     }
   }
 
+  @override
   void delete(BuildContext context, Project project) async {
     int result = await databaseHelper.deleteProject(project.projectId);
     if (result != 0) {
@@ -67,6 +69,7 @@ class ProjectListState extends State<ProjectList> with ActionsInterface<Project>
     }
   }
 
+  @override
   void reorder(BuildContext context, Project project, MovementType movementType) async {
     int result = await databaseHelper.reorderProject(project.projectPosition, movementType);
     if (result != 0) {
@@ -97,11 +100,13 @@ class ProjectListState extends State<ProjectList> with ActionsInterface<Project>
     });
   }
 
+  @override
   void updateTitle(int position) {
     projectList[position].title = projectControllers[position].text;
   }
 
   // Save data to database
+  @override
   void save(int position) async {
     if (_formKey.currentState.validate()) {
       int result;

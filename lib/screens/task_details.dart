@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_learning/models/project.dart';
 import 'package:flutter_learning/utils/database_helper.dart';
 import 'package:flutter_learning/models/task.dart';
+import 'package:flutter_learning/utils/task_action_helper.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
-import 'package:intl/intl.dart';
 
 class TaskDetails extends StatefulWidget {
   final String appBarTitle;
@@ -151,6 +151,7 @@ class TaskDetailsState extends State<TaskDetails> {
         ));
   }
 
+  // TODO Checkou if this actually works
   void moveToLastScreen() {
     Navigator.pop(context, true);
   }
@@ -181,28 +182,8 @@ class TaskDetailsState extends State<TaskDetails> {
 
   // Save data to database
   void _save() async {
-    if (_formKey.currentState.validate()) {
+    if (await TaskActionHelper.saveTaskToDatabase(context, _formKey, _task, databaseHelper) == 1) {
       moveToLastScreen();
-
-      _task.date = DateFormat.yMMMd().format(DateTime.now());
-      int result;
-      if (_task.taskId != null) {
-        // Case 1: Update operation
-        result = await databaseHelper.updateTask(_task);
-
-      } else {
-        // Case 2: Insert Operation
-        result = await databaseHelper.insertTask(_task);
-      }
-
-      if (result != 0) {
-        // Success
-        VisualHelper.showAlertDialog(context, "Status", "Task Saved Successfully");
-
-      } else {
-        // Failure
-        VisualHelper.showAlertDialog(context, "Status", "Problem Saving A Task");
-      }
     }
   }
 

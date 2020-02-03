@@ -15,7 +15,7 @@ class Home extends TaskListAbs {
 }
 
 class HomeState extends TaskListAbsState {
-  
+
   @override
   Widget build(BuildContext context) {
     if (projectList == null) {
@@ -38,8 +38,16 @@ class HomeState extends TaskListAbsState {
           },)
         ],
       ),
-      body: getKeepLikeListView(this, taskList, taskCount, taskControllers)
+      body: Form(
+        key: formKey,
+        child: getKeepLikeListView(this, taskList, taskCount, taskControllers)
+      )
     );
+  }
+
+  @override
+  void updateTitle(int position) {
+    taskList[position].title = taskControllers[position].text;
   }
 
   void navigateToProjects() async {
