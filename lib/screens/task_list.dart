@@ -41,7 +41,7 @@ class TaskListState extends TaskListAbsState {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(appBarTitle),
+        title: Text(appBarTitle + " Tasks"),
       ),
       body: Form(
         key: formKey,

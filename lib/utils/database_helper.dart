@@ -17,12 +17,14 @@ class DatabaseHelper {
   final String _taskTable = "task_table";
   final String _projectTable = "project_table";
   static final String colTaskId = "id";
+  static final String colTaskPosition = "position";
+  static final String colTaskCompleted = "task_completed";
   static final String colDate = "date";
   static final String colDescription = "description";
   static final String colProjectId = "projectId";
   static final String colProjectPosition = "position";
   static final String colProjectTitle = "title";
-  static final String colTaskPosition = "position";
+  static final String colProjectCompleted = "project_completed";
   static final String colTitle = "title";
 
   final String _taskTableOld = "_task_table_old";
