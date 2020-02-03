@@ -1,10 +1,12 @@
 import 'package:flutter_learning/models/project_id.dart';
+import 'package:flutter_learning/utils/bool_map_helper.dart';
 import 'package:flutter_learning/utils/database_helper.dart';
 
 class Project extends AbsWithProjectId {
 
   int _projectPosition;
   String _title;
+  bool _projectCompleted = false;
 
   Project.withTitleAndPosition(this._title, this._projectPosition);
 
@@ -14,10 +16,16 @@ class Project extends AbsWithProjectId {
 
   String get title => _title;
 
+  bool get projectCompleted => _projectCompleted;
+
   set title(String newTitle) {
     if (newTitle.length <= 255) {
       this._title = newTitle;
     }
+  }
+
+  set projectCompleted(bool completed) {
+    this._projectCompleted = completed;
   }
 
   Map<String, dynamic> toMap() {
@@ -27,6 +35,7 @@ class Project extends AbsWithProjectId {
     if (_projectPosition != null) map[DatabaseHelper.colProjectPosition] = _projectPosition;
 
     map[DatabaseHelper.colProjectTitle] = _title;
+    map[DatabaseHelper.colProjectCompleted] = BoolMapHelper.toMap(_projectCompleted);
 
     return map;
   }
@@ -35,5 +44,6 @@ class Project extends AbsWithProjectId {
     this.projectIdProtected = map[DatabaseHelper.colProjectId];
     this._projectPosition = map[DatabaseHelper.colProjectPosition];
     this._title = map[DatabaseHelper.colProjectTitle];
+    this._projectCompleted = BoolMapHelper.fromMap(map[DatabaseHelper.colProjectCompleted]);
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter_learning/models/project_id.dart';
+import 'package:flutter_learning/utils/bool_map_helper.dart';
 import 'package:flutter_learning/utils/database_helper.dart';
 
 class Task extends AbsWithProjectId {
@@ -6,6 +7,7 @@ class Task extends AbsWithProjectId {
   String _title;
   String _description;
   String _date;
+  bool _taskCompleted = false;
   int _taskPosition;
   int _projectPosition;
 
@@ -24,6 +26,8 @@ class Task extends AbsWithProjectId {
 
   String get description => _description;
 
+  bool get taskCompleted => _taskCompleted;
+
   int get taskPosition => _taskPosition;
 
   int get projectPosition => _projectPosition;
@@ -40,6 +44,10 @@ class Task extends AbsWithProjectId {
     if (newDescription.length <= 255) {
       this._description = newDescription;
     }
+  }
+
+  set taskCompleted(bool completed) {
+    this._taskCompleted = completed;
   }
 
   set taskPosition(int position) {
@@ -63,6 +71,7 @@ class Task extends AbsWithProjectId {
     map[DatabaseHelper.colDescription] = _description;
     map[DatabaseHelper.colProjectId] = projectIdProtected;
     map[DatabaseHelper.colDate] = _date;
+    map[DatabaseHelper.colTaskCompleted] = BoolMapHelper.toMap(_taskCompleted);
     map[DatabaseHelper.colTaskPosition] = _taskPosition;
 
     return map;
@@ -74,6 +83,7 @@ class Task extends AbsWithProjectId {
     this._description = map[DatabaseHelper.colDescription];
     this.projectIdProtected = map[DatabaseHelper.colProjectId];
     this._date = map[DatabaseHelper.colDate];
+    this._taskCompleted = BoolMapHelper.fromMap(map[DatabaseHelper.colTaskCompleted]);
     this._taskPosition = map[DatabaseHelper.colTaskPosition];
   }
 }

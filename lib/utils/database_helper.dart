@@ -12,7 +12,7 @@ class DatabaseHelper {
   static Database _database;
 
   final String _db = "projects.db";   // TODO updateDb renaming database file from notes.db in version 3->4
-  final int _databaseVersion = 5;
+  final int _databaseVersion = 6;
 
   final String _taskTable = "task_table";
   final String _projectTable = "project_table";
@@ -71,7 +71,8 @@ class DatabaseHelper {
     return "CREATE TABLE $_projectTable("
         "$colProjectId INTEGER PRIMARY KEY AUTOINCREMENT, "
         "$colProjectPosition INTEGER, "
-        "$colProjectTitle TEXT)";
+        "$colProjectTitle TEXT, "
+        "$colProjectCompleted TinyInt(1) NOT NULL DEFAULT 0);";
   }
 
   Future _createTaskTable(Database db) async {
@@ -85,7 +86,8 @@ class DatabaseHelper {
         "$colDescription TEXT,"
         "$colProjectId INTEGER,"
         "$colDate TEXT,"
-        "$colTaskPosition INTEGER)";
+        "$colTaskPosition INTEGER, "
+        "$colTaskCompleted TinyInt(1) NOT NULL DEFAULT 0);";
   }
 
   // TODO Test upgrades
@@ -139,6 +141,10 @@ class DatabaseHelper {
       } else if (oldVersion == 4) { // update colTaskPosition
         await db.execute("UPDATE $_taskTable "
             "SET $colTaskPosition = $colTaskId;");
+      
+      } else if (oldVersion == 5) { // add completed columns
+        await db.execute("ALTER TABLE $_taskTable ADD COLUMN $colTaskCompleted TinyInt(1) NOT NULL DEFAULT 0;");
+        await db.execute("ALTER TABLE $_projectTable ADD COLUMN $colProjectCompleted TinyInt(1) NOT NULL DEFAULT 0;");
       }
 
       await db.execute("DROP TABLE IF EXISTS $_taskTableOld");
