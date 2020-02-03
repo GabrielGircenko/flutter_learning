@@ -44,7 +44,7 @@ class ProjectListState extends State<ProjectList> with ActionsInterface<Project>
         body: Form(
             key: _formKey,
             child: getKeepLikeListView(this, 
-              projectList, _getProjectListCount(), projectControllers)
+              projectList, _getProjectListCount(), projectControllers, false)
           )
         );
   }

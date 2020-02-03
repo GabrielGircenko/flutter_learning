@@ -5,7 +5,7 @@ import 'package:flutter_learning/models/task.dart';
 import 'package:flutter_learning/screens/actions_interface.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
 
-ListView getKeepLikeListView<T extends AbsWithProjectId>(ActionsInterface callback, List<T> list, int itemCount, List<TextEditingController> itemControllers) {
+ListView getKeepLikeListView<T extends AbsWithProjectId>(ActionsInterface callback, List<T> list, int itemCount, List<TextEditingController> itemControllers, bool isHomeScreen) {
     return ListView.builder(
                   itemCount: itemCount,
                   itemBuilder: (BuildContext context, int position) {
@@ -34,41 +34,53 @@ ListView getKeepLikeListView<T extends AbsWithProjectId>(ActionsInterface callba
                                 onFieldSubmitted: (_) => callback.save(position)),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,         
-                              children: <Widget>[
-                                GestureDetector(
-                                  child: Icon(
-                                    Icons.arrow_upward,
-                                    color: Colors.grey,
-                                  ),
-                                  onTap: () {
-                                    callback.reorder(context, list[position], MovementType.moveUp);
-                                  },
-                                ),
-                                GestureDetector(
-                                  child: Icon(
-                                    Icons.arrow_downward,
-                                    color: Colors.grey,
-                                  ),
-                                  onTap: () {
-                                    callback.reorder(context, list[position], MovementType.moveDown);
-                                  },
-                                ),
-                                GestureDetector(
-                                  child: Icon(
-                                    Icons.delete,
-                                    color: Colors.grey,
-                                  ),
-                                  onTap: () {
-                                    callback.delete(context, list[position]);
-                                  },
-                                ),
-                                ]),
+                              children: makeChildren(context, callback, list, position, isHomeScreen)
+                              ),
                                 onTap: () {
                                   debugPrint("List Item Tapped");
                                   callback.itemClicked(position);
                                 }));
                   });
   }
+
+List<Widget> makeChildren<T extends AbsWithProjectId>(BuildContext context, ActionsInterface callback, 
+                                          List<T> list, int position, bool isHomeScreen) {
+  List<Widget> widgets = List<Widget>();
+
+  if (!isHomeScreen) {
+    widgets.add(GestureDetector(
+      child: Icon(
+        Icons.arrow_upward,
+        color: Colors.grey,
+      ),
+      onTap: () {
+        callback.reorder(context, list[position], MovementType.moveUp);
+      },
+    ));
+
+    widgets.add(GestureDetector(
+      child: Icon(
+        Icons.arrow_downward,
+        color: Colors.grey,
+      ),
+      onTap: () {
+        callback.reorder(context, list[position], MovementType.moveDown);
+      },
+    ));
+  }
+
+  widgets.add(GestureDetector(
+    child: Icon(
+      Icons.delete,
+      color: Colors.grey,
+    ),
+    onTap: () {
+      callback.delete(context, list[position]);
+    },
+  ));
+  
+  return widgets;
+}
 
 ListView getTaskListViewOld(BuildContext context, int taskCount, List<Task> taskList) {
     TextStyle titleStyle = Theme.of(context).textTheme.subhead;

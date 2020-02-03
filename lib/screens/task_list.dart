@@ -45,7 +45,7 @@ class TaskListState extends TaskListAbsState {
       ),
       body: Form(
         key: formKey,
-        child: getKeepLikeListView(this, taskList, taskCount, taskControllers)
+        child: getKeepLikeListView(this, taskList, taskCount, taskControllers, false)
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
