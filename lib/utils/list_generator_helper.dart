@@ -1,24 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_learning/enums/action_type.dart';
 import 'package:flutter_learning/enums/movement_type.dart';
 import 'package:flutter_learning/models/project_id.dart';
 import 'package:flutter_learning/models/task.dart';
 import 'package:flutter_learning/screens/actions_interface.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
 
-ListView getKeepLikeListView<T extends AbsWithProjectId>(ActionsInterface callback, List<T> list, int itemCount, List<TextEditingController> itemControllers, bool isHomeScreen) {
+ListView getKeepLikeListView<T extends AbsWithProjectId>(BuildContext context, ActionsInterface callback, List<T> list, int itemCount, List<TextEditingController> itemControllers, bool isHomeScreen) {
     return ListView.builder(
                   itemCount: itemCount,
-                  itemBuilder: (BuildContext context, int position) {
+                  itemBuilder: (context, int position) {
                     return Card(
                         color: Colors.white,
                         elevation: 2,
                         child: ListTile(
-                            leading: CircleAvatar(
-                                backgroundColor:
-                                    VisualHelper.getProjectColor(
-                                      list[position].projectId),
-                                child: VisualHelper.getProjectIcon(
-                                    list[position].projectId)),
+                            leading:  Row(
+                              mainAxisSize: MainAxisSize.min,         
+                              children: <Widget>[
+                                Checkbox(
+                                  value: list[position].completed,
+                                  onChanged: (completed) => callback.onCheckboxChanged(context, position, completed)),
+                                CircleAvatar(
+                                  backgroundColor:
+                                      VisualHelper.getProjectColor(
+                                        list[position].projectId),
+                                  child: VisualHelper.getProjectIcon(
+                                      list[position].projectId)
+                                      )
+                                ]
+                            ),
                             title: TextFormField(
                                 controller: itemControllers[position],
                                 validator: (String value) {
@@ -31,7 +41,7 @@ ListView getKeepLikeListView<T extends AbsWithProjectId>(ActionsInterface callba
                                     callback.updateTitle(position);
                                   }
                                 },
-                                onFieldSubmitted: (_) => callback.save(position)),
+                                onFieldSubmitted: (_) => callback.save(context, ActionType.updateTitle, position)),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,         
                               children: makeChildren(context, callback, list, position, isHomeScreen)

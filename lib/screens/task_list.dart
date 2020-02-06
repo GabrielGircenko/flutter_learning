@@ -45,7 +45,7 @@ class TaskListState extends TaskListAbsState {
       ),
       body: Form(
         key: formKey,
-        child: getKeepLikeListView(this, taskList, taskCount, taskControllers, false)
+        child: getKeepLikeListView(context, this, taskList, taskCount, taskControllers, false)
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -67,7 +67,7 @@ class TaskListState extends TaskListAbsState {
   void reorder(BuildContext context, Task task, MovementType movementType) async {
     int result = await databaseHelper.reorderTask(task.projectId, task.taskPosition, movementType);
     if (result != 0) {
-      showSnackBar(context, "Task Moved Successfully");
+      showSnackBar(context, "Task moved successfully");
       updateTaskListView();
     }
   }

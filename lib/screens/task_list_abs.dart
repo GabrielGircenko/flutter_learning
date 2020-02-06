@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_learning/enums/action_type.dart';
 import 'package:flutter_learning/models/project.dart';
 import 'package:flutter_learning/utils/screen_with_snackbar.dart';
 import 'package:flutter_learning/screens/actions_interface.dart';
@@ -34,7 +35,7 @@ abstract class TaskListAbsState extends State<TaskListAbs> with ActionsInterface
   }
 
   @override
-  void save(int position) async {
+  void save(BuildContext context, ActionType action, int position) async {
     await TaskActionHelper.saveTaskToDatabase(context, formKey, taskList[position], databaseHelper);
   }
 

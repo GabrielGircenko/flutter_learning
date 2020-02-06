@@ -1,0 +1,1 @@
+enum ActionType { add, updateTitle, move, check, uncheck, delete }
