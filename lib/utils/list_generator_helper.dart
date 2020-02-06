@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_learning/enums/action_type.dart';
 import 'package:flutter_learning/enums/movement_type.dart';
+import 'package:flutter_learning/enums/screen_type.dart';
 import 'package:flutter_learning/models/project_id.dart';
 import 'package:flutter_learning/models/task.dart';
 import 'package:flutter_learning/screens/actions_interface.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
 
-ListView getKeepLikeListView<T extends AbsWithProjectId>(BuildContext context, ActionsInterface callback, List<T> list, int itemCount, List<TextEditingController> itemControllers, bool isHomeScreen) {
+ListView getKeepLikeListView<T extends AbsWithProjectId>(BuildContext context, ActionsInterface callback, List<T> list, int itemCount, List<TextEditingController> itemControllers, ScreenType screenType) {
     return ListView.builder(
                   itemCount: itemCount,
                   itemBuilder: (context, int position) {
@@ -44,7 +45,7 @@ ListView getKeepLikeListView<T extends AbsWithProjectId>(BuildContext context, A
                                 onFieldSubmitted: (_) => callback.save(context, ActionType.updateTitle, position)),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,         
-                              children: makeChildren(context, callback, list, position, isHomeScreen)
+                              children: makeChildren(context, callback, list, position, screenType == ScreenType.home)
                               ),
                                 onTap: () {
                                   debugPrint("List Item Tapped");

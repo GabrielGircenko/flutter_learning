@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_learning/enums/action_type.dart';
 import 'package:flutter_learning/enums/movement_type.dart';
+import 'package:flutter_learning/enums/screen_type.dart';
 import 'package:flutter_learning/models/project.dart';
 import 'package:flutter_learning/utils/screen_with_snackbar.dart';
 import 'package:flutter_learning/screens/task_list.dart';
@@ -31,21 +32,27 @@ class ProjectListState extends State<ProjectList>
     }
 
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Projects"),
+      appBar: AppBar(
+        title: Text("Projects"),
+      ),
+      floatingActionButton: Builder(
+        builder: (BuildContext context) {
+          return FloatingActionButton(
+            onPressed: () {
+              debugPrint("FAB clicked");
+              _addBlankProject(context);
+            },
+            tooltip: "Add Project",
+            child: Icon(Icons.add),
+            );
+          }
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            debugPrint("FAB clicked");
-            _addBlankProject(context);
-          },
-          tooltip: "Add Project",
-          child: Icon(Icons.add),
-        ),
-        body: Form(
-            key: _formKey,
-            child: getKeepLikeListView(context, this, projectList,
-                _getProjectListCount(), projectControllers, false)));
+      body: Form(
+          key: _formKey,
+          child: getKeepLikeListView(context, this, projectList,
+              _getProjectListCount(), projectControllers, ScreenType.projects)
+          )
+      );
   }
 
   @override

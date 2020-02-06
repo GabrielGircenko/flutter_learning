@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_learning/enums/action_type.dart';
 import 'package:flutter_learning/enums/movement_type.dart';
+import 'package:flutter_learning/enums/screen_type.dart';
 import 'package:flutter_learning/enums/task_list_type.dart';
 import 'package:flutter_learning/models/project.dart';
 import 'package:flutter_learning/models/task.dart';
@@ -48,17 +50,27 @@ class TaskListState extends TaskListAbsState {
       ),
       body: Form(
         key: formKey,
-        child: getKeepLikeListView(context, this, taskList, taskCount, taskControllers, false)
+        child: getKeepLikeListView(context, this, taskList, taskCount, taskControllers, ScreenType.tasks)
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          debugPrint("FAB clicked");
-          navigateToTaskDetails(Task("", taskList.length, "", project.projectId, project.projectPosition), "Add Task");
-        },
-        tooltip: "Add Task",
-        child: Icon(Icons.add),
-      ),
-    );
+      floatingActionButton: Builder(
+        builder: (BuildContext context) {
+          return FloatingActionButton(
+            onPressed: () {
+              debugPrint("FAB clicked");
+              _addBlankTask(context);
+              //navigateToTaskDetails(Task("", taskList.length, "", project.projectId, project.projectPosition), "Add Task");
+            },
+            tooltip: "Add Task",
+            child: Icon(Icons.add),
+            );
+          },
+        )
+      );
+  }
+
+  void _addBlankTask(BuildContext context) {
+    taskList.add(Task("", taskList.length, "", project.projectId, project.projectPosition));
+    save(context, ActionType.add, taskList.length - 1);
   }
 
   @override
