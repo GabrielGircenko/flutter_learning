@@ -158,8 +158,13 @@ class DatabaseHelper {
 
     // TODO Use INNER JOIN after setting taskPositions in a separate screen
     return await db.rawQuery("SELECT foo.*, $_projectTable.$colProjectPosition as projectPosition "
-      "FROM (SELECT $_taskTable.$colTaskId, $_taskTable.$colTitle, $_taskTable.$colDescription, $_taskTable.$colProjectId, $_taskTable.$colDate, MIN($_taskTable.$colTaskPosition) FROM $_taskTable GROUP BY $_taskTable.$colProjectId) foo "
+      "FROM ("
+        "SELECT $_taskTable.$colTaskId, $_taskTable.$colTitle, $_taskTable.$colDescription, $_taskTable.$colProjectId, $_taskTable.$colDate, $_taskTable.$colTaskCompleted, MIN($_taskTable.$colTaskPosition) "
+        "FROM $_taskTable "
+        "GROUP BY $_taskTable.$colProjectId"
+      ") foo "
       "JOIN $_projectTable ON foo.$colProjectId = $_projectTable.$colProjectId "
+      "WHERE $_projectTable.$colProjectCompleted = 0 AND foo.$colTaskCompleted = 0 "
       "order by $_projectTable.$colProjectPosition;");
   }
 
