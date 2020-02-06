@@ -6,7 +6,6 @@ import 'package:flutter_learning/models/task.dart';
 import 'package:flutter_learning/screens/task_details.dart';
 import 'package:flutter_learning/screens/task_list_abs.dart';
 import 'package:flutter_learning/utils/list_generator_helper.dart';
-import 'package:sqflite/sqflite.dart';
 
 class TaskList extends TaskListAbs {
   
@@ -24,7 +23,11 @@ class TaskList extends TaskListAbs {
 class TaskListState extends TaskListAbsState {
   
   String appBarTitle;
+  @override
   Project project;
+
+  @override
+  TaskListType type = TaskListType.InAProject;
 
   TaskListState(this.project, this.appBarTitle);
   
@@ -80,27 +83,5 @@ class TaskListState extends TaskListAbsState {
     if (result) {
       updateTaskListView();
     }
-  }
-
-  void updateTaskListView() {
-    final Future<Database> dbFuture = databaseHelper.initializeDatabase();
-    dbFuture.then((database) {
-      Future<List<Task>> taskListFuture = databaseHelper.getTaskList(TaskListType.InAProject, project.projectId);  // TODO Update projectId
-      taskListFuture.then((taskList) {
-        setState(() {
-          this.taskList = taskList;
-          this.taskControllers = List<TextEditingController>();
-
-          this.taskCount = taskList.length;
-          for (int i = 0; i < this.taskList.length; i++) {
-            this.taskControllers.add(TextEditingController(
-                text: taskList[i].title != null
-                    ? taskList[i].title
-                    : "",
-            ));
-          }
-        });
-      });
-    });
   }
 }

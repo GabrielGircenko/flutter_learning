@@ -126,9 +126,9 @@ class ProjectListState extends State<ProjectList>
         result = await databaseHelper.insertProject(projectList[position]);
       }
 
+      String message = "";
+
       if (result != 0) {
-        // Success
-        String message = "Project saved successfully";
         if (action == ActionType.updateTitle) {
           message = "Title updated successfully";
 
@@ -137,14 +137,14 @@ class ProjectListState extends State<ProjectList>
         
         } else if (action == ActionType.uncheck) {
           message = "Project moved to active projects";
+
+        } else if (action == ActionType.add) {
+          message = "Project saved successfully";
         }
 
-        showSnackBar(context, message);
         updateProjectListView();
 
       } else {
-        // Failure
-        String message = "Problem saving the project";
         if (action == ActionType.updateTitle) {
           message = "Problem updating the title";
 
@@ -153,8 +153,13 @@ class ProjectListState extends State<ProjectList>
         
         } else if (action == ActionType.uncheck) {
           message = "Problem unchecking the project";
+        
+        } else if (action == ActionType.add) {
+          message = "Problem saving the project";
         } 
+      }
 
+      if (message.isNotEmpty) {
         showSnackBar(context, message);
       }
     }
