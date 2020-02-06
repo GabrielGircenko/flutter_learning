@@ -5,6 +5,7 @@ import 'package:flutter_learning/models/task.dart';
 import 'package:flutter_learning/utils/task_action_helper.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
 
+// This class is depricated and left in case of future need for more descriptive tasks
 class TaskDetails extends StatefulWidget {
   final String appBarTitle;
   final Task task;
