@@ -33,6 +33,11 @@ abstract class TaskListAbsState extends State<TaskListAbs> with ActionsInterface
   TaskListType type;
 
   @override
+  void updateTitle(int position) {
+    taskList[position].title = taskControllers[position].text;
+  }
+
+  @override
   void delete(BuildContext context, Task task) async {
     int result = await databaseHelper.deleteTask(task.taskId, task.projectId);
     if (result != 0) {

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_learning/models/task.dart';
 import 'package:flutter_learning/utils/database_helper.dart';
-import 'package:flutter_learning/utils/visual_helper.dart';
 import 'package:intl/intl.dart';
 
 class TaskActionHelper {
@@ -20,11 +19,9 @@ class TaskActionHelper {
           result = await databaseHelper.insertTask(task);
         }
 
-        VisualHelper.showAlertDialogAfterTaskSaveAttempt(context, "Status", "Task Saved Successfully", result);
-
         return result;
       }
 
-      return -1;
+      return 0;
     }
 }

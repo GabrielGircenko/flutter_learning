@@ -47,11 +47,6 @@ class HomeState extends TaskListAbsState {
     );
   }
 
-  @override
-  void updateTitle(int position) {
-    taskList[position].title = taskControllers[position].text;
-  }
-
   void navigateToProjects() async {
     bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
       return ProjectList();

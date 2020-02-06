@@ -3,6 +3,7 @@ import 'package:flutter_learning/utils/bool_map_helper.dart';
 import 'package:flutter_learning/utils/database_helper.dart';
 
 class Task extends AbsWithProjectId {
+  
   int _taskId;
   String _title;
   String _description;
@@ -64,8 +65,8 @@ class Task extends AbsWithProjectId {
     map[DatabaseHelper.colDescription] = _description;
     map[DatabaseHelper.colProjectId] = projectIdProtected;
     map[DatabaseHelper.colDate] = _date;
-    map[DatabaseHelper.colTaskCompleted] = BoolMapHelper.toMap(completed);
     map[DatabaseHelper.colTaskPosition] = _taskPosition;
+    map[DatabaseHelper.colTaskCompleted] = BoolMapHelper.toMap(completed);
 
     return map;
   }
@@ -76,7 +77,7 @@ class Task extends AbsWithProjectId {
     this._description = map[DatabaseHelper.colDescription];
     this.projectIdProtected = map[DatabaseHelper.colProjectId];
     this._date = map[DatabaseHelper.colDate];
-    setCompleted(BoolMapHelper.fromMap(map[DatabaseHelper.colTaskCompleted]));
     this._taskPosition = map[DatabaseHelper.colTaskPosition];
+    setCompleted(BoolMapHelper.fromMap(map[DatabaseHelper.colTaskCompleted]));
   }
 }
