@@ -28,7 +28,7 @@ class HomeState extends TaskListAbsState {
 
     if (taskList == null) {
       taskList = List<Task>();
-      updateTaskListView();
+      updateUncheckedListView();
     }
 
     return Scaffold(
@@ -54,6 +54,6 @@ class HomeState extends TaskListAbsState {
       return ProjectList();
     }));
 
-    updateTaskListView();
+    updateUncheckedListView();
   }
 }

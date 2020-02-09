@@ -33,7 +33,7 @@ class ProjectListState extends State<ProjectList>
   @override
   Widget build(BuildContext context) {
     if (projectList == null) {
-      updateProjectListView();
+      updateUncheckedListView();
     }
 
     if (checkedProjectList == null) {
@@ -88,7 +88,7 @@ class ProjectListState extends State<ProjectList>
     }));
 
     if (result != null) {
-      state.isChecked ? updateCheckedListView() : updateProjectListView();
+      state.isChecked ? updateCheckedListView() : updateUncheckedListView();
     }
   }
 
@@ -97,7 +97,7 @@ class ProjectListState extends State<ProjectList>
     int result = await databaseHelper.deleteProject(state.isChecked, project.projectId);
     if (result != 0) {
       showSnackBar(context, "Project deleted successfully");
-      state.isChecked ? updateCheckedListView() : updateProjectListView();
+      state.isChecked ? updateCheckedListView() : updateUncheckedListView();
     }
   }
 
@@ -109,7 +109,7 @@ class ProjectListState extends State<ProjectList>
         project.projectPosition, state.isChecked, movementType);
     if (result != 0) {
       showSnackBar(context, "Project moved successfully");
-      state.isChecked ? updateCheckedListView() : updateProjectListView();
+      state.isChecked ? updateCheckedListView() : updateUncheckedListView();
     }
   }
 
@@ -125,7 +125,8 @@ class ProjectListState extends State<ProjectList>
     save(context, state, completed ? ActionType.check : ActionType.uncheck, position);
   }
 
-  void updateProjectListView() {
+  @override
+  void updateUncheckedListView() {
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();
     dbFuture.then((database) {
       Future<List<Project>> projectListFuture = databaseHelper.getProjectList(false);
@@ -198,20 +199,22 @@ class ProjectListState extends State<ProjectList>
       String message = "";
 
       if (result != 0) {
+        state.isChecked ? updateCheckedListView() : updateUncheckedListView();
+
         if (action == ActionType.updateTitle) {
           message = "Title updated successfully";
 
         } else if (action == ActionType.check) {
           message = "Project done";
+          updateTheOppositeListView(state);
         
         } else if (action == ActionType.uncheck) {
           message = "Project moved to active projects";
+          updateTheOppositeListView(state);
 
         } else if (action == ActionType.add) {
           message = "Project saved successfully";
         }
-
-        state.isChecked ? updateCheckedListView() : updateProjectListView();
 
       } else {
         if (action == ActionType.updateTitle) {

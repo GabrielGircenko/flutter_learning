@@ -43,7 +43,7 @@ class TaskListState extends TaskListAbsState {
 
     if (taskList == null) {
       taskList = List<Task>();
-      updateTaskListView();
+      updateUncheckedListView();
     }
 
     if (checkedTaskList == null) {
@@ -100,7 +100,7 @@ class TaskListState extends TaskListAbsState {
     int result = await databaseHelper.reorderTask(state.isChecked, task.projectId, task.taskPosition, movementType);
     if (result != 0) {
       showSnackBar(context, "Task moved successfully");
-      state.isChecked ? updateCheckedListView() : updateTaskListView();
+      state.isChecked ? updateCheckedListView() : updateUncheckedListView();
     }
   }
 
@@ -110,7 +110,7 @@ class TaskListState extends TaskListAbsState {
     }));
 
     if (result) {
-      updateTaskListView();
+      updateUncheckedListView();
     }
   }
 

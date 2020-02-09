@@ -11,5 +11,9 @@ mixin ActionsInterface<T extends AbsWithProjectId> {
   void reorder(BuildContext context, T model, CheckedItemState state, MovementType movementType) {}
   void itemClicked(CheckedItemState state, int position) {}
   void onCheckboxChanged(BuildContext context, CheckedItemState state, int position, bool completed) {}
+  void updateUncheckedListView() {}
   void updateCheckedListView() {}
+  void updateTheOppositeListView(CheckedItemState state) {
+    state.isChecked ? updateUncheckedListView() : updateCheckedListView();
+  }
 } 

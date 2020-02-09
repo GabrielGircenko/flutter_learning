@@ -54,7 +54,7 @@ abstract class TaskListAbsState extends State<TaskListAbs> with ActionsInterface
     int result = await databaseHelper.deleteTask(state.isChecked, task.taskId, task.projectId);
     if (result != 0) {
       showSnackBar(context, "Task deleted successfully");
-      state.isChecked ? updateCheckedListView() : updateTaskListView();
+      state.isChecked ? updateCheckedListView() : updateUncheckedListView();
     }
   }
 
@@ -80,22 +80,22 @@ abstract class TaskListAbsState extends State<TaskListAbs> with ActionsInterface
 
     String message = "";
     if (result != 0) {
+      state.isChecked ? updateCheckedListView() : updateUncheckedListView();
+
       if (action == ActionType.updateTitle) {
         message = "Title updated successfully";
 
       } else if (action == ActionType.check) {
         message = "Task done";
-        _updateTheOppositeListView(state);
+        updateTheOppositeListView(state);
       
       } else if (action == ActionType.uncheck) {
         message = "Task moved to active tasks";
-        _updateTheOppositeListView(state);
+        updateTheOppositeListView(state);
 
       } else if (action == ActionType.add) {
         message = "Task saved successfully";
       }
-
-      state.isChecked ? updateCheckedListView() : updateTaskListView();
 
     } else {
       if (action == ActionType.updateTitle) {
@@ -117,12 +117,8 @@ abstract class TaskListAbsState extends State<TaskListAbs> with ActionsInterface
     }
   }
 
-  void _updateTheOppositeListView(CheckedItemState state) {
-    state.isChecked ? updateTaskListView() : updateCheckedListView();
-  }
-
-  @protected
-  void updateTaskListView() {
+  @override
+  void updateUncheckedListView() {
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();
     dbFuture.then((database) {
       Future<List<Task>> taskListFuture = databaseHelper.getTaskList(type, CheckedItemState.unchecked.isChecked, type == TaskListType.InAProject ? project.projectId : -1);  // TODO Update projectId
