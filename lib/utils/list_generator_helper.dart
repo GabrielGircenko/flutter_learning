@@ -60,25 +60,29 @@ List<Widget> makeChildren<T extends AbsWithProjectId>(BuildContext context, Acti
   List<Widget> widgets = List<Widget>();
 
   if (!isHomeScreen) {
-    widgets.add(GestureDetector(
-      child: Icon(
-        Icons.arrow_upward,
-        color: Colors.grey,
-      ),
-      onTap: () {
-        callback.reorder(context, list[position], state, MovementType.moveUp);
-      },
-    ));
+    if (position > 0) {
+      widgets.add(GestureDetector(
+        child: Icon(
+          Icons.arrow_upward,
+          color: Colors.grey,
+        ),
+        onTap: () {
+          callback.reorder(context, list[position], state, MovementType.moveUp);
+        },
+      ));
+    }
 
-    widgets.add(GestureDetector(
-      child: Icon(
-        Icons.arrow_downward,
-        color: Colors.grey,
-      ),
-      onTap: () {
-        callback.reorder(context, list[position], state, MovementType.moveDown);
-      },
-    ));
+    if (position < list.length - 1) {
+      widgets.add(GestureDetector(
+        child: Icon(
+          Icons.arrow_downward,
+          color: Colors.grey,
+        ),
+        onTap: () {
+          callback.reorder(context, list[position], state, MovementType.moveDown);
+        },
+      ));
+    }
   }
 
   widgets.add(GestureDetector(
