@@ -212,6 +212,22 @@ class DatabaseHelper {
   // TODO Make optimization algorithm which will decide if it's neccessary to reorder positions
   Future<int> _updateTaskPositionsAfterDelete(bool checked, int projectId) async {
     var taskList = await getTaskList(TaskListType.InAProject, checked, projectId);
+    _updateTaskPositions(taskList);
+  }
+
+  Future<int> updateTaskPositionsAfterOnCheckedChanged(int projectId) async {
+    var result = 1;
+
+    var taskList = await getTaskList(TaskListType.InAProject, false, projectId);
+    result *= await _updateTaskPositions(taskList);
+
+    var checkedTaskList = await getTaskList(TaskListType.InAProject, true, projectId);
+    result *= await _updateTaskPositions(checkedTaskList);
+
+    return result;
+  }
+
+  Future<int> _updateTaskPositions(List<Task> taskList) async {
     var result = 1;
 
     var db = await this.database;
@@ -329,6 +345,21 @@ class DatabaseHelper {
   // TODO Make optimization algorithm which will decide if it's neccessary to reorder positions
   Future<int> _updateProjectPositionsAfterDelete(bool checked) async {
     var projectList = await getProjectList(checked);
+    return _updateProjectPositions(projectList);
+  }
+
+  Future<int> updateProjectPositionsAfterOnCheckedChanged() async {
+    var result = 1;
+    var projectList = await getProjectList(false);
+    result *= await _updateProjectPositions(projectList);
+
+    var checkedProjectList = await getProjectList(true);
+    result *= await _updateProjectPositions(checkedProjectList);
+
+    return result;
+  }
+
+  Future<int> _updateProjectPositions(List<Project> projectList) async {
     var result = 1;
 
     var db = await this.database;

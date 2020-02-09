@@ -191,6 +191,10 @@ class ProjectListState extends State<ProjectList>
           result = await databaseHelper.updateProject(projectList[position]);
         }
 
+        if (action == ActionType.check || action == ActionType.uncheck) {
+          result *= await databaseHelper.updateProjectPositionsAfterOnCheckedChanged();
+        }
+
       } else {
         // Case 2: Insert Operation only for unchecked project list
         result = await databaseHelper.insertProject(projectList[position]);
