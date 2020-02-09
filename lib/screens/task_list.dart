@@ -57,21 +57,25 @@ class TaskListState extends TaskListAbsState {
       ),
       body: Form(
         key: formKey,
+          child: SingleChildScrollView(
         child: new Container(
-          child: new Column(
-            mainAxisSize: MainAxisSize.min,
-            //crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              new Expanded(
-                child: getKeepLikeListView(context, this, taskList, CheckedItemState.unchecked, taskCount, taskControllers, ScreenType.tasks),
+            child: new Column(
+              mainAxisSize: MainAxisSize.min,
+              //crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                new Flexible(
+                  child: 
+                  getKeepLikeListView(context, this, taskList, CheckedItemState.unchecked, taskCount, taskControllers, ScreenType.tasks),          
+                ),
+                Divider(),
+                Text("Checked items"), 
+                //new Flexible(
+                 // child: 
+                  getKeepLikeListView(context, this, checkedTaskList, CheckedItemState.checked, checkedTaskCount, checkedTaskControllers, ScreenType.tasks),
+                //),
+                ],
               ),
-              Divider(),
-              Text("Checked items"), 
-              new Expanded(
-                child: getKeepLikeListView(context, this, checkedTaskList, CheckedItemState.checked, checkedTaskCount, checkedTaskControllers, ScreenType.tasks)
-              ),
-              ],
-            ),
+          ),
         ),
       ),
       floatingActionButton: Builder(
