@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_learning/enums/action_type.dart';
+import 'package:flutter_learning/enums/checked_item_state.dart';
 import 'package:flutter_learning/enums/movement_type.dart';
 import 'package:flutter_learning/enums/screen_type.dart';
 import 'package:flutter_learning/models/project_id.dart';
@@ -7,7 +8,7 @@ import 'package:flutter_learning/models/task.dart';
 import 'package:flutter_learning/screens/actions_interface.dart';
 import 'package:flutter_learning/utils/visual_helper.dart';
 
-ListView getKeepLikeListView<T extends AbsWithProjectId>(BuildContext context, ActionsInterface callback, List<T> list, int itemCount, List<TextEditingController> itemControllers, ScreenType screenType) {
+ListView getKeepLikeListView<T extends AbsWithProjectId>(BuildContext context, ActionsInterface callback, List<T> list, CheckedItemState state, int itemCount, List<TextEditingController> itemControllers, ScreenType screenType) {
     return ListView.builder(
                   itemCount: itemCount,
                   itemBuilder: (context, int position) {
@@ -20,7 +21,7 @@ ListView getKeepLikeListView<T extends AbsWithProjectId>(BuildContext context, A
                               children: <Widget>[
                                 Checkbox(
                                   value: list[position].completed,
-                                  onChanged: (completed) => callback.onCheckboxChanged(context, position, completed)),
+                                  onChanged: (completed) => callback.onCheckboxChanged(context, state, position, completed)),
                                 CircleAvatar(
                                   backgroundColor:
                                       VisualHelper.getProjectColor(
@@ -39,23 +40,23 @@ ListView getKeepLikeListView<T extends AbsWithProjectId>(BuildContext context, A
                                   } else {
                                     debugPrint(
                                         "Something changed in Title Text Field");
-                                    callback.updateTitle(position);
+                                    callback.updateTitle(state, position);
                                   }
                                 },
-                                onFieldSubmitted: (_) => callback.save(context, ActionType.updateTitle, position)),
+                                onFieldSubmitted: (_) => callback.save(context, state, ActionType.updateTitle, position)),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,         
-                              children: makeChildren(context, callback, list, position, screenType == ScreenType.home)
+                              children: makeChildren(context, callback, list, state, position, screenType == ScreenType.home)
                               ),
                                 onTap: () {
                                   debugPrint("List Item Tapped");
-                                  callback.itemClicked(position);
+                                  callback.itemClicked(state, position);
                                 }));
                   });
   }
 
 List<Widget> makeChildren<T extends AbsWithProjectId>(BuildContext context, ActionsInterface callback, 
-                                          List<T> list, int position, bool isHomeScreen) {
+                                          List<T> list, CheckedItemState state, int position, bool isHomeScreen) {
   List<Widget> widgets = List<Widget>();
 
   if (!isHomeScreen) {
@@ -65,7 +66,7 @@ List<Widget> makeChildren<T extends AbsWithProjectId>(BuildContext context, Acti
         color: Colors.grey,
       ),
       onTap: () {
-        callback.reorder(context, list[position], MovementType.moveUp);
+        callback.reorder(context, list[position], state, MovementType.moveUp);
       },
     ));
 
@@ -75,7 +76,7 @@ List<Widget> makeChildren<T extends AbsWithProjectId>(BuildContext context, Acti
         color: Colors.grey,
       ),
       onTap: () {
-        callback.reorder(context, list[position], MovementType.moveDown);
+        callback.reorder(context, list[position], state, MovementType.moveDown);
       },
     ));
   }
@@ -86,7 +87,7 @@ List<Widget> makeChildren<T extends AbsWithProjectId>(BuildContext context, Acti
       color: Colors.grey,
     ),
     onTap: () {
-      callback.delete(context, list[position]);
+      callback.delete(context, list[position], state);
     },
   ));
   

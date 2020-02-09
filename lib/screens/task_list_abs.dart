@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_learning/enums/action_type.dart';
+import 'package:flutter_learning/enums/checked_item_state.dart';
 import 'package:flutter_learning/enums/task_list_type.dart';
 import 'package:flutter_learning/models/project.dart';
 import 'package:flutter_learning/utils/screen_with_snackbar.dart';
@@ -16,45 +17,67 @@ abstract class TaskListAbsState extends State<TaskListAbs> with ActionsInterface
   @protected
   DatabaseHelper databaseHelper = DatabaseHelper();
   @protected
-  List<Task> taskList;
-  @protected
   List<Project> projectList;
-  @protected
-  List<TextEditingController> taskControllers;
-  @protected
-  int taskCount = 0;
   @protected
   int projectCount = 0;
   @protected
-  var formKey = GlobalKey<FormState>();
-  @protected
   Project project;
+  @protected
+  List<Task> taskList;
+  @protected
+  int taskCount = 0;
+  @protected
+  List<TextEditingController> taskControllers;
+  @protected
+  List<Task> checkedTaskList;
+  @protected
+  int checkedTaskCount = 0;
+  @protected
+  List<TextEditingController> checkedTaskControllers;
+  @protected
+  var formKey = GlobalKey<FormState>();
   @protected
   TaskListType type;
 
   @override
-  void updateTitle(int position) {
-    taskList[position].title = taskControllers[position].text;
-  }
+  void updateTitle(CheckedItemState state, int position) {
+    if (state.isChecked) {
+      checkedTaskList[position].title = checkedTaskControllers[position].text;
 
-  @override
-  void delete(BuildContext context, Task task) async {
-    int result = await databaseHelper.deleteTask(task.taskId, task.projectId);
-    if (result != 0) {
-      showSnackBar(context, "Task deleted successfully");
-      updateTaskListView();
+    } else {
+      taskList[position].title = taskControllers[position].text;
     }
   }
 
   @override
-  void onCheckboxChanged(BuildContext context, int position, bool completed) {
-    taskList[position].setCompleted(completed);
-    save(context, completed ? ActionType.check : ActionType.uncheck, position);
+  void delete(BuildContext context, Task task, CheckedItemState state) async {
+    int result = await databaseHelper.deleteTask(state.isChecked, task.taskId, task.projectId);
+    if (result != 0) {
+      showSnackBar(context, "Task deleted successfully");
+      state.isChecked ? updateCheckedListView() : updateTaskListView();
+    }
   }
 
   @override
-  void save(BuildContext context, ActionType action, int position) async {
-    int result = await TaskActionHelper.saveTaskToDatabase(context, formKey, taskList[position], databaseHelper);
+  void onCheckboxChanged(BuildContext context, CheckedItemState state, int position, bool completed) {
+    if (state.isChecked) {
+      checkedTaskList[position].setCompleted(completed);
+
+    } else {
+      taskList[position].setCompleted(completed);
+    }
+
+    save(context, state, completed ? ActionType.check : ActionType.uncheck, position);
+  }
+
+  @override
+  void save(BuildContext context, CheckedItemState state, ActionType action, int position) async {
+    int result = await TaskActionHelper.saveTaskToDatabase(
+      context, 
+      formKey, 
+      state.isChecked ? checkedTaskList[position] : taskList[position], 
+      databaseHelper);
+
     String message = "";
     if (result != 0) {
       if (action == ActionType.updateTitle) {
@@ -62,15 +85,17 @@ abstract class TaskListAbsState extends State<TaskListAbs> with ActionsInterface
 
       } else if (action == ActionType.check) {
         message = "Task done";
+        _updateTheOppositeListView(state);
       
       } else if (action == ActionType.uncheck) {
         message = "Task moved to active tasks";
+        _updateTheOppositeListView(state);
 
       } else if (action == ActionType.add) {
         message = "Task saved successfully";
       }
 
-      updateTaskListView();
+      state.isChecked ? updateCheckedListView() : updateTaskListView();
 
     } else {
       if (action == ActionType.updateTitle) {
@@ -92,11 +117,15 @@ abstract class TaskListAbsState extends State<TaskListAbs> with ActionsInterface
     }
   }
 
+  void _updateTheOppositeListView(CheckedItemState state) {
+    state.isChecked ? updateTaskListView() : updateCheckedListView();
+  }
+
   @protected
   void updateTaskListView() {
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();
     dbFuture.then((database) {
-      Future<List<Task>> taskListFuture = databaseHelper.getTaskList(type, type == TaskListType.InAProject ? project.projectId : -1);  // TODO Update projectId
+      Future<List<Task>> taskListFuture = databaseHelper.getTaskList(type, CheckedItemState.unchecked.isChecked, type == TaskListType.InAProject ? project.projectId : -1);  // TODO Update projectId
       taskListFuture.then((taskList) {
         setState(() {
           this.taskList = taskList;

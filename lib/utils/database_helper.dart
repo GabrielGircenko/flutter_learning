@@ -170,12 +170,14 @@ class DatabaseHelper {
   }
 
   // Fetch Operation: Get all task objects from database
-  Future<List<Map<String, dynamic>>> getTaskMapListInsideAProject(int projectId) async {
+  Future<List<Map<String, dynamic>>> getTaskMapListInsideAProject(int projectId, bool checkedItems) async {
     Database db = await this.database;
+
+    int checkedItemsTinyInt = checkedItems ? 1 : 0;
 
     return await db.rawQuery("SELECT * "
       "FROM $_taskTable "
-      "WHERE $colProjectId = $projectId "
+      "WHERE $colProjectId = $projectId AND $colTaskCompleted = $checkedItemsTinyInt "
       "order by $colTaskPosition;");
   }
 
@@ -195,12 +197,12 @@ class DatabaseHelper {
 
   // TODO Don't reorder if the task has the highest value of #colTaskId in the table
   // Delete Operation: Delete a Task object from database
-  Future<int> deleteTask(int taskId, int projectId) async {
+  Future<int> deleteTask(bool checked, int taskId, int projectId) async {
     var db = await this.database;
     var result = await db.rawDelete("DELETE FROM $_taskTable WHERE $colTaskId = $taskId");
 
     if (result != 0) {
-      return await _updateTaskPositionsAfterDelete(projectId);
+      return await _updateTaskPositionsAfterDelete(checked, projectId);
     
     } else {
       return 0;
@@ -208,8 +210,8 @@ class DatabaseHelper {
   }
 
   // TODO Make optimization algorithm which will decide if it's neccessary to reorder positions
-  Future<int> _updateTaskPositionsAfterDelete(int projectId) async {
-    var taskList = await getTaskList(TaskListType.InAProject, projectId);
+  Future<int> _updateTaskPositionsAfterDelete(bool checked, int projectId) async {
+    var taskList = await getTaskList(TaskListType.InAProject, checked, projectId);
     var result = 1;
 
     var db = await this.database;
@@ -234,14 +236,14 @@ class DatabaseHelper {
   // TODO Order by colProjectPosition
   // Get the 'Map List' [ List<Map> ] and convert it to 'Task List' [ List<Task> ]
   // projectId is ignored in case of Home task list
-  Future<List<Task>> getTaskList(TaskListType type, int projectId) async {
+  Future<List<Task>> getTaskList(TaskListType type, bool checked, int projectId) async {
     var taskMapList; // Get 'Map List' from database
     if (type == TaskListType.Home) {
       taskMapList = await getHomeTaskMapList();
 
-    } else {
-      taskMapList = await getTaskMapListInsideAProject(projectId);
-    }
+    } else if (type == TaskListType.InAProject) {
+      taskMapList = await getTaskMapListInsideAProject(projectId, checked);
+    } 
 
     int count =
         taskMapList.length; // Count the number of map entries in db table
@@ -257,8 +259,8 @@ class DatabaseHelper {
 
   // TODO Finish reorderTask method
   // Reorder Operation: Reorder a Task object in database
-  Future<int> reorderTask(int projectId, int taskPosition, MovementType movementType) async {
-    var taskList = await getTaskList(TaskListType.InAProject, projectId);
+  Future<int> reorderTask(bool checked, int projectId, int taskPosition, MovementType movementType) async {
+    var taskList = await getTaskList(TaskListType.InAProject, checked, projectId);
     var result = 1;
     
     if (movementType == MovementType.moveUp) {
@@ -311,13 +313,13 @@ class DatabaseHelper {
 
   // TODO Don't reorder if the project has the highest value of #colProjectId in the table
   // Delete Operation: Delete a Project object from database
-  Future<int> deleteProject(int projectId) async {
+  Future<int> deleteProject(bool checked, int projectId) async {
     var db = await this.database;
     var result = await db.rawDelete(
         "DELETE FROM $_projectTable WHERE $colProjectId = $projectId");
     
     if (result != 0) {
-      return await _updateProjectPositionsAfterDelete();
+      return await _updateProjectPositionsAfterDelete(checked);
 
     } else {
       return 0;
@@ -325,8 +327,8 @@ class DatabaseHelper {
   }
 
   // TODO Make optimization algorithm which will decide if it's neccessary to reorder positions
-  Future<int> _updateProjectPositionsAfterDelete() async {
-    var projectList = await getProjectList();
+  Future<int> _updateProjectPositionsAfterDelete(bool checked) async {
+    var projectList = await getProjectList(checked);
     var result = 1;
 
     var db = await this.database;
@@ -341,8 +343,8 @@ class DatabaseHelper {
 
   // TODO Finish reorderProject method
   // Reorder Operation: Reorder a Project object in database
-  Future<int> reorderProject(int projectPosition, MovementType movementType) async {
-    var projectList = await getProjectList();
+  Future<int> reorderProject(int projectPosition, bool isChecked, MovementType movementType) async {
+    var projectList = await getProjectList(isChecked);
     var result = 1;
     
     if (movementType == MovementType.moveUp) {
@@ -388,16 +390,17 @@ class DatabaseHelper {
   }
 
   // Fetch Operation: Get all priority objects from database
-  Future<List<Map<String, dynamic>>> getProjectMapList() async {
+  Future<List<Map<String, dynamic>>> getProjectMapList(bool checkedItems) async {
     Database db = await this.database;
-    var result = await db.query(_projectTable, orderBy: "$colProjectPosition");
+    int checkedItemsTinyInt = checkedItems ? 1 : 0;
+    var result = await db.query(_projectTable, where: "$colProjectCompleted = $checkedItemsTinyInt", orderBy: "$colProjectPosition");
     return result;
   }
 
   // Get the 'Map List' [ List<Map> ] and convert it to 'Project List' [ List<Project> ]
-  Future<List<Project>> getProjectList() async {
+  Future<List<Project>> getProjectList(bool checkedItems) async {
     var projectMapList =
-        await getProjectMapList(); // Get 'Map List' from database
+        await getProjectMapList(checkedItems); // Get 'Map List' from database
     int count = projectMapList.length; // Count the number of map entries in db table
 
     List<Project> projectList = List<Project>();

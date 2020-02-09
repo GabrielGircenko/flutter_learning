@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_learning/enums/checked_item_state.dart';
 import 'package:flutter_learning/enums/screen_type.dart';
 import 'package:flutter_learning/enums/task_list_type.dart';
 import 'package:flutter_learning/models/project.dart';
@@ -43,7 +44,7 @@ class HomeState extends TaskListAbsState {
       ),
       body: Form(
         key: formKey,
-        child: getKeepLikeListView(context, this, taskList, taskCount, taskControllers, ScreenType.home)
+        child: getKeepLikeListView(context, this, taskList, CheckedItemState.unchecked, taskCount, taskControllers, ScreenType.home)
       )
     );
   }

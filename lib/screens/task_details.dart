@@ -140,7 +140,7 @@ class TaskDetailsState extends State<TaskDetails> {
                                 ),
                                 onPressed: () {
                                   debugPrint("Delete button clicked");
-                                  _delete();
+                                  _delete(_task.completed);
                                 }),
                           )
                         ],
@@ -188,7 +188,7 @@ class TaskDetailsState extends State<TaskDetails> {
     }
   }
 
-  void _delete() async {
+  void _delete(bool checked) async {
     moveToLastScreen();
 
     // Case 1: If user is trying to delete the NEW TASK i.e. he has come to
@@ -199,9 +199,10 @@ class TaskDetailsState extends State<TaskDetails> {
     }
 
     // Case 2: User is trying to delete the old task that already has a valid ID.
-    int result = await databaseHelper.deleteTask(_task.taskId, _task.projectId);
+    int result = await databaseHelper.deleteTask(checked, _task.taskId, _task.projectId);
     if (result != 0) {
       VisualHelper.showAlertDialog(context, "Status", "Task Deleted Successfully");
+
     } else {
       VisualHelper.showAlertDialog(context, "Status", "Error Occured while Deleting Task");
     }

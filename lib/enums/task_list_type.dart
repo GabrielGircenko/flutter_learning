@@ -1,1 +1,1 @@
-enum TaskListType { Home, InAProject}
+enum TaskListType { Home, InAProject }

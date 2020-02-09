@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_learning/enums/action_type.dart';
+import 'package:flutter_learning/enums/checked_item_state.dart';
 import 'package:flutter_learning/enums/movement_type.dart';
 import 'package:flutter_learning/enums/screen_type.dart';
 import 'package:flutter_learning/enums/task_list_type.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_learning/models/task.dart';
 import 'package:flutter_learning/screens/task_details.dart';
 import 'package:flutter_learning/screens/task_list_abs.dart';
 import 'package:flutter_learning/utils/list_generator_helper.dart';
+import 'package:sqflite/sqlite_api.dart';
 
 class TaskList extends TaskListAbs {
   
@@ -24,14 +26,14 @@ class TaskList extends TaskListAbs {
 
 class TaskListState extends TaskListAbsState {
   
-  String appBarTitle;
+  String _appBarTitle;
   @override
   Project project;
 
   @override
   TaskListType type = TaskListType.InAProject;
 
-  TaskListState(this.project, this.appBarTitle);
+  TaskListState(this.project, this._appBarTitle);
   
   @override
   Widget build(BuildContext context) {
@@ -44,13 +46,33 @@ class TaskListState extends TaskListAbsState {
       updateTaskListView();
     }
 
+    if (checkedTaskList == null) {
+      checkedTaskList = List<Task>();
+      updateCheckedListView();
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(appBarTitle + " Tasks"),
+        title: Text(_appBarTitle + " Tasks"),
       ),
       body: Form(
         key: formKey,
-        child: getKeepLikeListView(context, this, taskList, taskCount, taskControllers, ScreenType.tasks)
+        child: new Container(
+          child: new Column(
+            mainAxisSize: MainAxisSize.min,
+            //crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              new Expanded(
+                child: getKeepLikeListView(context, this, taskList, CheckedItemState.unchecked, taskCount, taskControllers, ScreenType.tasks),
+              ),
+              Divider(),
+              Text("Checked items"), 
+              new Expanded(
+                child: getKeepLikeListView(context, this, checkedTaskList, CheckedItemState.checked, checkedTaskCount, checkedTaskControllers, ScreenType.tasks)
+              ),
+              ],
+            ),
+        ),
       ),
       floatingActionButton: Builder(
         builder: (BuildContext context) {
@@ -70,15 +92,15 @@ class TaskListState extends TaskListAbsState {
 
   void _addBlankTask(BuildContext context) {
     taskList.add(Task("", taskList.length, "", project.projectId, project.projectPosition));
-    save(context, ActionType.add, taskList.length - 1);
+    save(context, CheckedItemState.unchecked, ActionType.add, taskList.length - 1);
   }
 
   @override
-  void reorder(BuildContext context, Task task, MovementType movementType) async {
-    int result = await databaseHelper.reorderTask(task.projectId, task.taskPosition, movementType);
+  void reorder(BuildContext context, Task task, CheckedItemState state, MovementType movementType) async {
+    int result = await databaseHelper.reorderTask(state.isChecked, task.projectId, task.taskPosition, movementType);
     if (result != 0) {
       showSnackBar(context, "Task moved successfully");
-      updateTaskListView();
+      state.isChecked ? updateCheckedListView() : updateTaskListView();
     }
   }
 
@@ -90,5 +112,28 @@ class TaskListState extends TaskListAbsState {
     if (result) {
       updateTaskListView();
     }
+  }
+
+  @override
+  void updateCheckedListView() {
+    final Future<Database> dbFuture = databaseHelper.initializeDatabase();
+    dbFuture.then((database) {
+    Future<List<Task>> taskListFuture = databaseHelper.getTaskList(TaskListType.InAProject, CheckedItemState.checked.isChecked, project.projectId);
+      taskListFuture.then((taskList) {
+        setState(() {
+          this.checkedTaskList = taskList;
+          this.checkedTaskControllers = List<TextEditingController>();
+
+          this.checkedTaskCount = checkedTaskList.length;
+          for (int i = 0; i < this.checkedTaskList.length; i++) {
+            this.checkedTaskControllers.add(TextEditingController(
+                text: checkedTaskList[i].title != null
+                    ? checkedTaskList[i].title
+                    : "",
+            ));
+          }
+        });
+      });
+    });
   }
 }

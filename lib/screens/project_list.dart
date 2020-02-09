@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_learning/enums/action_type.dart';
+import 'package:flutter_learning/enums/checked_item_state.dart';
 import 'package:flutter_learning/enums/movement_type.dart';
 import 'package:flutter_learning/enums/screen_type.dart';
 import 'package:flutter_learning/models/project.dart';
@@ -20,9 +21,13 @@ class ProjectList extends StatefulWidget {
 
 class ProjectListState extends State<ProjectList>
     with ActionsInterface<Project>, ScreenWithSnackbar {
+
   DatabaseHelper databaseHelper = DatabaseHelper();
   List<Project> projectList;
   List<TextEditingController> projectControllers;
+  List<Project> checkedProjectList;
+  List<TextEditingController> checkedProjectControllers;
+
   var _formKey = GlobalKey<FormState>();
 
   @override
@@ -49,54 +54,62 @@ class ProjectListState extends State<ProjectList>
         ),
       body: Form(
           key: _formKey,
-          child: getKeepLikeListView(context, this, projectList,
+          child: getKeepLikeListView(context, this, projectList, CheckedItemState.unchecked,
               _getProjectListCount(), projectControllers, ScreenType.projects)
           )
       );
   }
 
   @override
-  void itemClicked(int position) async {
+  void itemClicked(CheckedItemState state, int position) async {
     bool result =
         await Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return TaskList(projectList[position], projectList[position].title);
+      return TaskList(state.isChecked ? checkedProjectList[position] : projectList[position], 
+                      state.isChecked ? checkedProjectList[position].title : projectList[position].title);
     }));
 
     if (result != null) {
-      updateProjectListView();
+      state.isChecked ? updateCheckedListView() : updateProjectListView();
     }
   }
 
   @override
-  void delete(BuildContext context, Project project) async {
-    int result = await databaseHelper.deleteProject(project.projectId);
+  void delete(BuildContext context, Project project, CheckedItemState state) async {
+    int result = await databaseHelper.deleteProject(state.isChecked, project.projectId);
     if (result != 0) {
       showSnackBar(context, "Project deleted successfully");
-      updateProjectListView();
+      state.isChecked ? updateCheckedListView() : updateProjectListView();
     }
   }
 
   @override
-  void reorder(
-      BuildContext context, Project project, MovementType movementType) async {
+  void reorder(BuildContext context, Project project, CheckedItemState state, 
+                MovementType movementType) async {
+
     int result = await databaseHelper.reorderProject(
-        project.projectPosition, movementType);
+        project.projectPosition, state.isChecked, movementType);
     if (result != 0) {
       showSnackBar(context, "Project moved successfully");
-      updateProjectListView();
+      state.isChecked ? updateCheckedListView() : updateProjectListView();
     }
   }
 
   @override
-  void onCheckboxChanged(BuildContext context, int position, bool completed) {
-    projectList[position].setCompleted(completed);
-    save(context, completed ? ActionType.check : ActionType.uncheck, position);
+  void onCheckboxChanged(BuildContext context, CheckedItemState state, int position, bool completed) {
+    if (state.isChecked) {
+      checkedProjectList[position].setCompleted(completed);
+
+    } else {
+      projectList[position].setCompleted(completed);
+    }
+
+    save(context, state, completed ? ActionType.check : ActionType.uncheck, position);
   }
 
   void updateProjectListView() {
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();
     dbFuture.then((database) {
-      Future<List<Project>> projectListFuture = databaseHelper.getProjectList();
+      Future<List<Project>> projectListFuture = databaseHelper.getProjectList(false);
       projectListFuture.then((projectList) {
         setState(() {
           this.projectList = projectList;
@@ -114,22 +127,52 @@ class ProjectListState extends State<ProjectList>
   }
 
   @override
-  void updateTitle(int position) {
-    projectList[position].title = projectControllers[position].text;
+  void updateCheckedListView() {
+    final Future<Database> dbFuture = databaseHelper.initializeDatabase();
+    dbFuture.then((database) {
+      Future<List<Project>> projectListFuture = databaseHelper.getProjectList(true);
+      projectListFuture.then((projectList) {
+        setState(() {
+          this.checkedProjectList = projectList;
+          this.checkedProjectControllers = List<TextEditingController>();
+
+          for (int i = 0; i < this.checkedProjectList.length; i++) {
+            this.checkedProjectControllers.add(TextEditingController(
+                  text: checkedProjectList[i].title != null ? checkedProjectList[i].title : "",
+                ));
+          }
+        });
+      });
+    });
+  }
+
+  @override
+  void updateTitle(CheckedItemState state, int position) {
+    if (state.isChecked) {
+      checkedProjectList[position].title = checkedProjectControllers[position].text;
+    
+    } else {
+      projectList[position].title = projectControllers[position].text;
+    }
   }
 
   // Save data to database
   @override
-  void save(BuildContext context, ActionType action, int position) async {
+  void save(BuildContext context, CheckedItemState state, ActionType action, int position) async {
     if (_formKey.currentState.validate()) {
       int result;
       if (projectList[position] != null &&
           projectList[position].projectId != null) {
         // Case 1: Update operation
-        result = await databaseHelper.updateProject(projectList[position]);
+        if (state.isChecked) {
+          result = await databaseHelper.updateProject(checkedProjectList[position]);
+        
+        } else {
+          result = await databaseHelper.updateProject(projectList[position]);
+        }
 
       } else {
-        // Case 2: Insert Operation
+        // Case 2: Insert Operation only for unchecked project list
         result = await databaseHelper.insertProject(projectList[position]);
       }
 
@@ -149,7 +192,7 @@ class ProjectListState extends State<ProjectList>
           message = "Project saved successfully";
         }
 
-        updateProjectListView();
+        state.isChecked ? updateCheckedListView() : updateProjectListView();
 
       } else {
         if (action == ActionType.updateTitle) {
@@ -174,7 +217,7 @@ class ProjectListState extends State<ProjectList>
 
   void _addBlankProject(BuildContext context) {
     projectList.add(new Project.withTitleAndPosition("", projectList.length));
-    save(context, ActionType.add, projectList.length - 1);
+    save(context, CheckedItemState.unchecked, ActionType.add, projectList.length - 1);
   }
 
   int _getProjectListCount() {
