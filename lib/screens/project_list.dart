@@ -36,6 +36,10 @@ class ProjectListState extends State<ProjectList>
       updateProjectListView();
     }
 
+    if (checkedProjectList == null) {
+      updateCheckedListView();
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Projects"),
@@ -54,10 +58,25 @@ class ProjectListState extends State<ProjectList>
         ),
       body: Form(
           key: _formKey,
-          child: getKeepLikeListView(context, this, projectList, CheckedItemState.unchecked,
-              _getProjectListCount(), projectControllers, ScreenType.projects)
-          )
-      );
+          child: SingleChildScrollView(
+            child: new Container(
+              child: new Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  new Flexible(
+                    child: getKeepLikeListView(context, this, projectList, CheckedItemState.unchecked,
+                                              _getProjectListCount(), projectControllers, ScreenType.projects),
+                  ),
+                  Divider(),
+                  Text("Checked items"), 
+                  getKeepLikeListView(context, this, checkedProjectList, CheckedItemState.checked,
+                                              _getCheckedProjectListCount(), checkedProjectControllers, ScreenType.projects),
+                ],
+              ),
+            ),
+          ),
+      ),
+    );
   }
 
   @override
@@ -223,6 +242,15 @@ class ProjectListState extends State<ProjectList>
   int _getProjectListCount() {
     if (this.projectList != null) {
       return this.projectList.length;
+
+    } else {
+      return 0;
+    }
+  }
+
+  int _getCheckedProjectListCount() {
+    if (this.checkedProjectList != null) {
+      return this.checkedProjectList.length;
 
     } else {
       return 0;

@@ -57,11 +57,10 @@ class TaskListState extends TaskListAbsState {
       ),
       body: Form(
         key: formKey,
-          child: SingleChildScrollView(
-        child: new Container(
+        child: SingleChildScrollView(
+          child: new Container(
             child: new Column(
               mainAxisSize: MainAxisSize.min,
-              //crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 new Flexible(
                   child: 
@@ -69,12 +68,9 @@ class TaskListState extends TaskListAbsState {
                 ),
                 Divider(),
                 Text("Checked items"), 
-                //new Flexible(
-                 // child: 
-                  getKeepLikeListView(context, this, checkedTaskList, CheckedItemState.checked, checkedTaskCount, checkedTaskControllers, ScreenType.tasks),
-                //),
-                ],
-              ),
+                getKeepLikeListView(context, this, checkedTaskList, CheckedItemState.checked, checkedTaskCount, checkedTaskControllers, ScreenType.tasks),
+              ],
+            ),
           ),
         ),
       ),
