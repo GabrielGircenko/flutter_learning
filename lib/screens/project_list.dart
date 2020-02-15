@@ -192,7 +192,7 @@ class ProjectListState extends State<ProjectList>
         }
 
         if (action == ActionType.check || action == ActionType.uncheck) {
-          result *= await databaseHelper.updateProjectPositionsAfterOnCheckedChanged();
+          result *= await databaseHelper.updateProjectPositionsAfterOnCheckedChanged(action == ActionType.check);
         }
 
       } else {

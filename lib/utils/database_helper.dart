@@ -1,6 +1,7 @@
 import 'package:flutter_learning/enums/movement_type.dart';
 import 'package:flutter_learning/enums/task_list_type.dart';
 import 'package:flutter_learning/models/project.dart';
+import 'package:flutter_learning/models/project_id.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'dart:io';
@@ -257,13 +258,21 @@ class DatabaseHelper {
     return _updateTaskPositions(taskList);
   }
 
-  Future<int> updateTaskPositionsAfterOnCheckedChanged(int projectId) async {
+  Future<int> updateTaskPositionsAfterOnCheckedChanged(int projectId, bool checked) async {
     var result = 1;
 
     var taskList = await getTaskList(TaskListType.InAProject, false, projectId);
+    if (!checked) {
+      taskList = _prepareListForUpdatingPositions(taskList);
+    }
+
     result *= await _updateTaskPositions(taskList);
 
     var checkedTaskList = await getTaskList(TaskListType.InAProject, true, projectId);
+    if (checked) {
+      checkedTaskList = _prepareListForUpdatingPositions(checkedTaskList);
+    }
+
     result *= await _updateTaskPositions(checkedTaskList);
 
     return result;
@@ -272,15 +281,40 @@ class DatabaseHelper {
   Future<int> _updateTaskPositions(List<Task> taskList) async {
     var result = 1;
 
-    var db = await this.database;
-    for (int i = 0; i < taskList.length; i++) {
-      var id = taskList[i].taskId;
-      result *= await db.rawUpdate("UPDATE $_taskTable "
-        "SET $colTaskPosition = $i "
-        "WHERE $colTaskId = $id;");
+    if (taskList.length > 1) {
+      var db = await this.database;
+      for (int i = 0; i < taskList.length; i++) {
+        var id = taskList[i].taskId;
+        result *= await db.rawUpdate("UPDATE $_taskTable "
+          "SET $colTaskPosition = $i "
+          "WHERE $colTaskId = $id;");
+      }
     }
 
     return result;
+  }
+
+  // Use only for onCheckedChanged
+  List<T> _prepareListForUpdatingPositions<T extends AbsWithProjectId>(List<T> list) {
+    if (list.length > 1) {
+      int maxTime = 0;
+      int maxTimePosition = 0;
+      for (int i = 0; i < list.length; i++) {
+        if (maxTime < list[i].dateModified) {
+          maxTime = list[i].dateModified;
+          maxTimePosition = i;
+        }
+      }
+
+      if (list[0].completed) {  // add item to the beginning
+        list.insert(0, list.removeAt(maxTimePosition));        
+
+      } else {  // add item to the end
+        list.add(list.removeAt(maxTimePosition));
+      }
+    }
+
+    return list;
   }
 
   // Get number of Task objects in database
@@ -390,25 +424,35 @@ class DatabaseHelper {
     return _updateProjectPositions(projectList);
   }
 
-  Future<int> updateProjectPositionsAfterOnCheckedChanged() async {
+  Future<int> updateProjectPositionsAfterOnCheckedChanged(bool checked) async {
     var result = 1;
     var projectList = await getProjectList(false);
+    if (!checked) {
+      projectList = _prepareListForUpdatingPositions(projectList);
+    }
+
     result *= await _updateProjectPositions(projectList);
 
     var checkedProjectList = await getProjectList(true);
+    if (checked) {
+      checkedProjectList = _prepareListForUpdatingPositions(checkedProjectList);
+    }
+
     result *= await _updateProjectPositions(checkedProjectList);
 
     return result;
   }
 
-  Future<int> _updateProjectPositions(List<Project> projectList) async {
+  Future<int> _updateProjectPositions(List<Project> projectList) async {   
     var result = 1;
 
-    var db = await this.database;
-    for (int i = 0; i < projectList.length; i++) {
-      var id = projectList[i].projectId;
-      result *= await db.rawUpdate("UPDATE $_projectTable " 
-          "SET $colProjectPosition = $i WHERE $colProjectId = $id");
+    if (projectList.length > 1) {
+      var db = await this.database;
+      for (int i = 0; i < projectList.length; i++) {
+        var id = projectList[i].projectId;
+        result *= await db.rawUpdate("UPDATE $_projectTable " 
+            "SET $colProjectPosition = $i WHERE $colProjectId = $id");
+      }
     }
 
     return result;

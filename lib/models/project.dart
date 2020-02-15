@@ -38,5 +38,6 @@ class Project extends AbsWithProjectId {
     this._projectPosition = map[DatabaseHelper.colProjectPosition];
     this._title = map[DatabaseHelper.colTitle];
     setCompleted(BoolMapHelper.fromMap(map[DatabaseHelper.colProjectCompleted]));
+    this.dateModifiedProtected = DateTime.parse(map[DatabaseHelper.colDateModified]).millisecondsSinceEpoch;
   }
 }

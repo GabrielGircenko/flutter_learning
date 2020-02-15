@@ -8,9 +8,14 @@ class AbsWithProjectId {
   
   bool _completed = false;
 
+  @protected
+  int dateModifiedProtected;
+
   int get projectId => projectIdProtected;
 
   bool get completed => _completed;
+
+  int get dateModified => dateModifiedProtected;
 
   void setCompleted(bool value) {
     _completed = value;

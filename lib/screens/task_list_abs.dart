@@ -80,7 +80,7 @@ abstract class TaskListAbsState extends State<TaskListAbs> with ActionsInterface
 
     if (action == ActionType.check || action == ActionType.uncheck) {
       result *= await databaseHelper.updateTaskPositionsAfterOnCheckedChanged(
-            state.isChecked ? checkedTaskList[position].projectId : taskList[position].projectId);
+            state.isChecked ? checkedTaskList[position].projectId : taskList[position].projectId, action == ActionType.check);
     }
 
     String message = "";

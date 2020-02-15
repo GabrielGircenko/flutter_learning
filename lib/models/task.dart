@@ -70,5 +70,6 @@ class Task extends AbsWithProjectId {
     this.projectIdProtected = map[DatabaseHelper.colProjectId];
     this._taskPosition = map[DatabaseHelper.colTaskPosition];
     setCompleted(BoolMapHelper.fromMap(map[DatabaseHelper.colTaskCompleted]));
+    this.dateModifiedProtected = DateTime.parse(map[DatabaseHelper.colDateModified]).millisecondsSinceEpoch;
   }
 }
