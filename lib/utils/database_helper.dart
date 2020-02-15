@@ -12,20 +12,21 @@ class DatabaseHelper {
   static Database _database;
 
   final String _db = "projects.db";   // TODO updateDb renaming database file from notes.db in version 3->4
-  final int _databaseVersion = 6;
+  final int _databaseVersion = 7;
 
   final String _taskTable = "task_table";
   final String _projectTable = "project_table";
   static final String colTaskId = "id";
   static final String colTaskPosition = "position";
   static final String colTaskCompleted = "task_completed";
-  static final String colDate = "date";
-  static final String colDescription = "description";
+  static final String colTaskDescription = "description";
   static final String colProjectId = "projectId";
   static final String colProjectPosition = "position";
-  static final String colProjectTitle = "title";
   static final String colProjectCompleted = "project_completed";
   static final String colTitle = "title";
+  static final String colDateModified = "date_modified";
+  //static final String colDateCreated = "date_created";  
+  //static final String colDateDue = "date_due";
 
   final String _taskTableOld = "_task_table_old";
   final String _projectTableOld = "_project_table_old";
@@ -33,7 +34,8 @@ class DatabaseHelper {
   final String _taskTableV1 = "note_table";
   final String _projectTableV3 = "priority_table";
   final String _colProjectIdV1 = "priority";
-  static final String colProjectIdV3 = "priorityId";
+  static final String _colDateV6 = "date";
+  static final String _colProjectIdV3 = "priorityId";
 
   DatabaseHelper._createInstance();
 
@@ -65,29 +67,50 @@ class DatabaseHelper {
 
   Future _createProjectTable(Database db) async {
     await db.execute(_getCreateProjectTableQuery());
+    await db.execute(_getCreateProjectTriggerQuery());
+  }
+
+  Future _createTaskTable(Database db) async {
+    await db.execute(_getCreateTaskTableQuery());
+    await db.execute(_getCreateTaskTriggerQuery());
   }
 
   String _getCreateProjectTableQuery() {
     return "CREATE TABLE $_projectTable("
         "$colProjectId INTEGER PRIMARY KEY AUTOINCREMENT, "
         "$colProjectPosition INTEGER, "
-        "$colProjectTitle TEXT, "
+        "$colTitle TEXT, "
+        "$colDateModified INTEGER DEFAULT CURRENT_TIMESTAMP, "
         "$colProjectCompleted TinyInt(1) NOT NULL DEFAULT 0);";
   }
 
-  Future _createTaskTable(Database db) async {
-    await db.execute(_getCreateTaskTableQuery());
+  String _getCreateProjectTriggerQuery() {
+    return "CREATE TRIGGER update_project_modified_date "
+        "AFTER UPDATE ON $_projectTable "
+        "FOR EACH ROW "
+        "BEGIN "
+        "UPDATE $_projectTable SET $colDateModified = CURRENT_TIMESTAMP WHERE $colProjectId = old.$colProjectId;"
+        "END";
   }
 
   String _getCreateTaskTableQuery() {
     return "CREATE TABLE $_taskTable("
         "$colTaskId INTEGER PRIMARY KEY AUTOINCREMENT, "
-        "$colTitle TEXT,"
-        "$colDescription TEXT,"
-        "$colProjectId INTEGER,"
-        "$colDate TEXT,"
+        "$colTitle TEXT, "
+        "$colTaskDescription TEXT, "
+        "$colProjectId INTEGER, "
+        "$colDateModified INTEGER DEFAULT CURRENT_TIMESTAMP, "
         "$colTaskPosition INTEGER, "
         "$colTaskCompleted TinyInt(1) NOT NULL DEFAULT 0);";
+  }
+
+  String _getCreateTaskTriggerQuery() {
+    return "CREATE TRIGGER update_task_modified_date "
+        "AFTER UPDATE ON $_taskTable "
+        "FOR EACH ROW "
+        "BEGIN "
+        "UPDATE $_taskTable SET $colDateModified = CURRENT_TIMESTAMP WHERE $colTaskId = old.$colTaskId; "
+        "END"; 
   }
 
   // TODO Test upgrades
@@ -97,13 +120,13 @@ class DatabaseHelper {
         await db.execute(
             "ALTER TABLE $_taskTableV1 RENAME TO $_taskTableOld;");
 
-        await db.execute(_getCreateTaskTableQuery());
+        _createTaskTable(db);
 
-        await db.execute("INSERT INTO $_taskTable ($colTaskId, $colTitle, $colDescription, $colProjectId, $colDate) "
-            "SELECT $colTaskId, $colTitle, $colDescription, $_colProjectIdV1, $colDate "
+        await db.execute("INSERT INTO $_taskTable ($colTaskId, $colTitle, $colTaskDescription, $colProjectId, $_colDateV6) "
+            "SELECT $colTaskId, $colTitle, $colTaskDescription, $_colProjectIdV1, $colDateModified "
             "FROM $_taskTableOld;");
 
-        await db.execute(_getCreateProjectTableQuery());
+        _createProjectTable(db);
 
         await db.execute("INSERT INTO $_projectTable ($colProjectPosition) "
             "SELECT $_colProjectIdV1 "
@@ -113,29 +136,29 @@ class DatabaseHelper {
         await db.execute(
             "ALTER TABLE $_projectTableV3 RENAME TO $_projectTableOld;");
 
-        await db.execute(_getCreateProjectTableQuery());
+        _createProjectTable(db);
 
-        await db.execute("INSERT INTO $_projectTable ($colProjectPosition, $colProjectTitle) "
-            "SELECT $colProjectId, $colProjectTitle "
+        await db.execute("INSERT INTO $_projectTable ($colProjectPosition, $colTitle) "
+            "SELECT $colProjectId, $colTitle "
             "FROM $_projectTableOld;");
 
       } else if (oldVersion == 3) { // update name of the task and project tables
         await db.execute(
             "ALTER TABLE $_taskTableV1 RENAME TO $_taskTableOld;");
 
-        await db.execute(_getCreateTaskTableQuery());
+        _createTaskTable(db);
 
-        await db.execute("INSERT INTO $_taskTable ($colTaskId, $colTitle, $colDescription, $colProjectId, $colDate) "
-            "SELECT $colTaskId, $colTitle, $colDescription, $_colProjectIdV1, $colDate "
+        await db.execute("INSERT INTO $_taskTable ($colTaskId, $colTitle, $colTaskDescription, $colProjectId, $_colDateV6) "
+            "SELECT $colTaskId, $colTitle, $colTaskDescription, $_colProjectIdV1, $colDateModified "
             "FROM $_taskTableOld;");
 
         await db.execute(
             "ALTER TABLE $_projectTableV3 RENAME TO $_projectTableOld;");
 
-        await db.execute(_getCreateProjectTableQuery());
+        _createProjectTable(db);
 
-        await db.execute("INSERT INTO $_projectTable ($colProjectPosition, $colProjectTitle) "
-            "SELECT $colProjectIdV3, $colProjectTitle "
+        await db.execute("INSERT INTO $_projectTable ($colProjectPosition, $colTitle) "
+            "SELECT $_colProjectIdV3, $colTitle "
             "FROM $_projectTableOld;");
 
       } else if (oldVersion == 4) { // update colTaskPosition
@@ -145,10 +168,29 @@ class DatabaseHelper {
       } else if (oldVersion == 5) { // add completed columns
         await db.execute("ALTER TABLE $_taskTable ADD COLUMN $colTaskCompleted TinyInt(1) NOT NULL DEFAULT 0;");
         await db.execute("ALTER TABLE $_projectTable ADD COLUMN $colProjectCompleted TinyInt(1) NOT NULL DEFAULT 0;");
+      
+      } else if (oldVersion == 6) { // add date modified column to project list, rename date column in task list
+        await db.execute(
+              "ALTER TABLE $_taskTable RENAME TO $_taskTableOld;");
+
+        _createTaskTable(db);
+
+        await db.execute("INSERT INTO $_taskTable ($colTaskId, $colTitle, $colTaskDescription, $colProjectId, $colTaskPosition, $colTaskCompleted) "
+            "SELECT $colTaskId, $colTitle, $colTaskDescription, $colProjectId, $colTaskPosition, $colTaskCompleted "
+            "FROM $_taskTableOld;");
+
+        await db.execute(
+            "ALTER TABLE $_projectTable RENAME TO $_projectTableOld;");
+
+        _createProjectTable(db);
+
+        await db.execute("INSERT INTO $_projectTable ($colProjectId, $colProjectPosition, $colTitle, $colProjectCompleted) "
+            "SELECT $colProjectId, $colProjectPosition, $colTitle, $colProjectCompleted "
+            "FROM $_projectTableOld;");
       }
 
-      await db.execute("DROP TABLE IF EXISTS $_taskTableOld");
-      await db.execute("DROP TABLE IF EXISTS $_projectTableOld");
+      await db.execute("DROP TABLE IF EXISTS $_taskTableOld;");
+      await db.execute("DROP TABLE IF EXISTS $_projectTableOld;");
     }
   }
 
@@ -159,7 +201,7 @@ class DatabaseHelper {
     // TODO Use INNER JOIN after setting taskPositions in a separate screen
     return await db.rawQuery("SELECT foo.*, $_projectTable.$colProjectPosition as projectPosition "
       "FROM ("
-        "SELECT $_taskTable.$colTaskId, $_taskTable.$colTitle, $_taskTable.$colDescription, $_taskTable.$colProjectId, $_taskTable.$colDate, $_taskTable.$colTaskCompleted, MIN($_taskTable.$colTaskPosition) as $colTaskPosition "
+        "SELECT $_taskTable.$colTaskId, $_taskTable.$colTitle, $_taskTable.$colTaskDescription, $_taskTable.$colProjectId, $_taskTable.$colDateModified, $_taskTable.$colTaskCompleted, MIN($_taskTable.$colTaskPosition) as $colTaskPosition "
         "FROM $_taskTable "
         "WHERE $_taskTable.$colTaskCompleted = 0 "
         "GROUP BY $_taskTable.$colProjectId"
@@ -212,7 +254,7 @@ class DatabaseHelper {
   // TODO Make optimization algorithm which will decide if it's neccessary to reorder positions
   Future<int> _updateTaskPositionsAfterDelete(bool checked, int projectId) async {
     var taskList = await getTaskList(TaskListType.InAProject, checked, projectId);
-    _updateTaskPositions(taskList);
+    return _updateTaskPositions(taskList);
   }
 
   Future<int> updateTaskPositionsAfterOnCheckedChanged(int projectId) async {

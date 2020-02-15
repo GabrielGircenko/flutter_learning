@@ -91,7 +91,7 @@ class TaskListState extends TaskListAbsState {
   }
 
   void _addBlankTask(BuildContext context) {
-    taskList.add(Task("", taskList.length, "", project.projectId, project.projectPosition));
+    taskList.add(Task("", taskList.length, project.projectId, project.projectPosition));
     save(context, CheckedItemState.unchecked, ActionType.add, taskList.length - 1);
   }
 

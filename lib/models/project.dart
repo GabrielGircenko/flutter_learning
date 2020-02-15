@@ -27,7 +27,7 @@ class Project extends AbsWithProjectId {
     if (projectId != null) map[DatabaseHelper.colProjectId] = projectIdProtected;
     if (_projectPosition != null) map[DatabaseHelper.colProjectPosition] = _projectPosition;
 
-    map[DatabaseHelper.colProjectTitle] = _title;
+    map[DatabaseHelper.colTitle] = _title;
     map[DatabaseHelper.colProjectCompleted] = BoolMapHelper.toMap(completed);
 
     return map;
@@ -36,7 +36,7 @@ class Project extends AbsWithProjectId {
   Project.fromMapObject(Map<String, dynamic> map) {
     this.projectIdProtected = map[DatabaseHelper.colProjectId];
     this._projectPosition = map[DatabaseHelper.colProjectPosition];
-    this._title = map[DatabaseHelper.colProjectTitle];
+    this._title = map[DatabaseHelper.colTitle];
     setCompleted(BoolMapHelper.fromMap(map[DatabaseHelper.colProjectCompleted]));
   }
 }

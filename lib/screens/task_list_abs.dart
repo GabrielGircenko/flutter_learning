@@ -126,7 +126,7 @@ abstract class TaskListAbsState extends State<TaskListAbs> with ActionsInterface
   void updateUncheckedListView() {
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();
     dbFuture.then((database) {
-      Future<List<Task>> taskListFuture = databaseHelper.getTaskList(type, CheckedItemState.unchecked.isChecked, type == TaskListType.InAProject ? project.projectId : -1);  // TODO Update projectId
+      Future<List<Task>> taskListFuture = databaseHelper.getTaskList(type, CheckedItemState.unchecked.isChecked, type == TaskListType.InAProject ? project.projectId : -1); 
       taskListFuture.then((taskList) {
         setState(() {
           this.taskList = taskList;
