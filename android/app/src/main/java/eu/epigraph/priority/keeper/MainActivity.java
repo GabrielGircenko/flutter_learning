@@ -1,4 +1,4 @@
-package eu.epigraph.flutter_learning;
+package eu.epigraph.priority.keeper;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;
