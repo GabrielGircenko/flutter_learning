@@ -1,21 +1,22 @@
-import 'package:flutter_learning/models/project_id.dart';
-import 'package:flutter_learning/utils/bool_map_helper.dart';
-import 'package:flutter_learning/utils/database_helper.dart';
+import 'package:priority_keeper/models/project_id.dart';
+import 'package:priority_keeper/utils/bool_map_helper.dart';
+import 'package:priority_keeper/utils/database_helper.dart';
 
 class Task extends AbsWithProjectId {
-  
   int _taskId;
   String _title;
   String _description;
   int _taskPosition;
   int _projectPosition;
 
-  Task(this._title, this._taskPosition, projectId, this._projectPosition, [this._description]) {
+  Task(this._title, this._taskPosition, projectId, this._projectPosition,
+      [this._description]) {
     projectIdProtected = projectId;
   }
 
-  Task.withId(this._taskId, this._taskPosition, this._title, projectIdProtected, this._projectPosition,
-      [this._description])  {
+  Task.withId(this._taskId, this._taskPosition, this._title, projectIdProtected,
+      this._projectPosition,
+      [this._description]) {
     projectIdProtected = projectId;
   }
 
@@ -70,6 +71,8 @@ class Task extends AbsWithProjectId {
     this.projectIdProtected = map[DatabaseHelper.colProjectId];
     this._taskPosition = map[DatabaseHelper.colTaskPosition];
     setCompleted(BoolMapHelper.fromMap(map[DatabaseHelper.colTaskCompleted]));
-    this.dateModifiedProtected = DateTime.parse(map[DatabaseHelper.colDateModified]).millisecondsSinceEpoch;
+    this.dateModifiedProtected =
+        DateTime.parse(map[DatabaseHelper.colDateModified])
+            .millisecondsSinceEpoch;
   }
 }

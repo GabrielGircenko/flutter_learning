@@ -1,9 +1,8 @@
-import 'package:flutter_learning/models/project_id.dart';
-import 'package:flutter_learning/utils/bool_map_helper.dart';
-import 'package:flutter_learning/utils/database_helper.dart';
+import 'package:priority_keeper/models/project_id.dart';
+import 'package:priority_keeper/utils/bool_map_helper.dart';
+import 'package:priority_keeper/utils/database_helper.dart';
 
 class Project extends AbsWithProjectId {
-
   int _projectPosition;
   String _title;
 
@@ -24,8 +23,10 @@ class Project extends AbsWithProjectId {
   Map<String, dynamic> toMap() {
     var map = Map<String, dynamic>();
 
-    if (projectId != null) map[DatabaseHelper.colProjectId] = projectIdProtected;
-    if (_projectPosition != null) map[DatabaseHelper.colProjectPosition] = _projectPosition;
+    if (projectId != null)
+      map[DatabaseHelper.colProjectId] = projectIdProtected;
+    if (_projectPosition != null)
+      map[DatabaseHelper.colProjectPosition] = _projectPosition;
 
     map[DatabaseHelper.colTitle] = _title;
     map[DatabaseHelper.colProjectCompleted] = BoolMapHelper.toMap(completed);
@@ -37,7 +38,10 @@ class Project extends AbsWithProjectId {
     this.projectIdProtected = map[DatabaseHelper.colProjectId];
     this._projectPosition = map[DatabaseHelper.colProjectPosition];
     this._title = map[DatabaseHelper.colTitle];
-    setCompleted(BoolMapHelper.fromMap(map[DatabaseHelper.colProjectCompleted]));
-    this.dateModifiedProtected = DateTime.parse(map[DatabaseHelper.colDateModified]).millisecondsSinceEpoch;
+    setCompleted(
+        BoolMapHelper.fromMap(map[DatabaseHelper.colProjectCompleted]));
+    this.dateModifiedProtected =
+        DateTime.parse(map[DatabaseHelper.colDateModified])
+            .millisecondsSinceEpoch;
   }
 }

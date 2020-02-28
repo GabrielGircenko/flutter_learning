@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_learning/enums/checked_item_state.dart';
-import 'package:flutter_learning/enums/screen_type.dart';
-import 'package:flutter_learning/enums/task_list_type.dart';
-import 'package:flutter_learning/models/project.dart';
-import 'package:flutter_learning/screens/project_list.dart';
-import 'package:flutter_learning/screens/task_list_abs.dart';
-import 'package:flutter_learning/utils/list_generator_helper.dart';
-import 'package:flutter_learning/models/task.dart';
+import 'package:priority_keeper/enums/checked_item_state.dart';
+import 'package:priority_keeper/enums/screen_type.dart';
+import 'package:priority_keeper/enums/task_list_type.dart';
+import 'package:priority_keeper/models/project.dart';
+import 'package:priority_keeper/models/task.dart';
+import 'package:priority_keeper/screens/project_list.dart';
+import 'package:priority_keeper/screens/task_list_abs.dart';
+import 'package:priority_keeper/utils/list_generator_helper.dart';
 
 class Home extends TaskListAbs {
   @override
@@ -16,7 +16,6 @@ class Home extends TaskListAbs {
 }
 
 class HomeState extends TaskListAbsState {
-
   @override
   TaskListType type = TaskListType.Home;
 
@@ -32,25 +31,33 @@ class HomeState extends TaskListAbsState {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Tasks"),
-        actions: <Widget>[
-          IconButton(icon: Icon(Icons.settings),
-          tooltip: "Projects",
-          onPressed: () {
-            navigateToProjects();
-          },)
-        ],
-      ),
-      body: Form(
-        key: formKey,
-        child: getKeepLikeListView(context, this, taskList, CheckedItemState.unchecked, taskCount, taskControllers, ScreenType.home)
-      )
-    );
+        appBar: AppBar(
+          title: Text("Tasks"),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.settings),
+              tooltip: "Projects",
+              onPressed: () {
+                navigateToProjects();
+              },
+            )
+          ],
+        ),
+        body: Form(
+            key: formKey,
+            child: getKeepLikeListView(
+                context,
+                this,
+                taskList,
+                CheckedItemState.unchecked,
+                taskCount,
+                taskControllers,
+                ScreenType.home)));
   }
 
   void navigateToProjects() async {
-    bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
+    bool result =
+        await Navigator.push(context, MaterialPageRoute(builder: (context) {
       return ProjectList();
     }));
 

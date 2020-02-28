@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_learning/models/project.dart';
-import 'package:flutter_learning/utils/database_helper.dart';
-import 'package:flutter_learning/models/task.dart';
-import 'package:flutter_learning/utils/task_action_helper.dart';
-import 'package:flutter_learning/utils/visual_helper.dart';
+import 'package:priority_keeper/models/project.dart';
+import 'package:priority_keeper/models/task.dart';
+import 'package:priority_keeper/utils/database_helper.dart';
+import 'package:priority_keeper/utils/task_action_helper.dart';
+import 'package:priority_keeper/utils/visual_helper.dart';
 
 // This class is depricated and left in case of future need for more descriptive tasks
 class TaskDetails extends StatefulWidget {
@@ -19,7 +19,6 @@ class TaskDetails extends StatefulWidget {
 }
 
 class TaskDetailsState extends State<TaskDetails> {
-
   var _formKey = GlobalKey<FormState>();
 
   DatabaseHelper databaseHelper = DatabaseHelper();
@@ -34,10 +33,7 @@ class TaskDetailsState extends State<TaskDetails> {
 
   @override
   Widget build(BuildContext context) {
-    var textStyle = Theme
-        .of(context)
-        .textTheme
-        .title;
+    var textStyle = Theme.of(context).textTheme.title;
 
     titleController.text = _task.title;
     descriptionController.text = _task.description;
@@ -69,7 +65,6 @@ class TaskDetailsState extends State<TaskDetails> {
                         validator: (String value) {
                           if (value.isEmpty) {
                             return "Please enter the task title.";
-
                           } else {
                             debugPrint("Something changed in task title field");
                             updateTitle();
@@ -78,9 +73,7 @@ class TaskDetailsState extends State<TaskDetails> {
                         decoration: InputDecoration(
                             labelText: "Title",
                             labelStyle: textStyle,
-                            errorStyle: TextStyle(
-                              fontSize: 15
-                            ),
+                            errorStyle: TextStyle(fontSize: 15),
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(5))),
                       ),
@@ -108,12 +101,8 @@ class TaskDetailsState extends State<TaskDetails> {
                         children: <Widget>[
                           Expanded(
                             child: RaisedButton(
-                                color: Theme
-                                    .of(context)
-                                    .primaryColorDark,
-                                textColor: Theme
-                                    .of(context)
-                                    .primaryColorLight,
+                                color: Theme.of(context).primaryColorDark,
+                                textColor: Theme.of(context).primaryColorLight,
                                 child: Text(
                                   "Save",
                                   textScaleFactor: 1.5,
@@ -128,12 +117,8 @@ class TaskDetailsState extends State<TaskDetails> {
                           ),
                           Expanded(
                             child: RaisedButton(
-                                color: Theme
-                                    .of(context)
-                                    .primaryColorDark,
-                                textColor: Theme
-                                    .of(context)
-                                    .primaryColorLight,
+                                color: Theme.of(context).primaryColorDark,
+                                textColor: Theme.of(context).primaryColorLight,
                                 child: Text(
                                   "Delete",
                                   textScaleFactor: 1.5,
@@ -160,12 +145,7 @@ class TaskDetailsState extends State<TaskDetails> {
   List<DropdownMenuItem<Project>> _buildDropdownMenuItems(List<Project> list) {
     List<DropdownMenuItem<Project>> items = List();
     for (Project project in list) {
-      items.add(
-        DropdownMenuItem(
-          value: project,
-          child: Text(project.title)
-        )
-      );
+      items.add(DropdownMenuItem(value: project, child: Text(project.title)));
     }
 
     return items;
@@ -183,7 +163,9 @@ class TaskDetailsState extends State<TaskDetails> {
 
   // Save data to database
   void _save() async {
-    if (await TaskActionHelper.saveTaskToDatabase(context, _formKey, _task, databaseHelper) == 1) {
+    if (await TaskActionHelper.saveTaskToDatabase(
+            context, _formKey, _task, databaseHelper) ==
+        1) {
       moveToLastScreen();
     }
   }
@@ -199,12 +181,14 @@ class TaskDetailsState extends State<TaskDetails> {
     }
 
     // Case 2: User is trying to delete the old task that already has a valid ID.
-    int result = await databaseHelper.deleteTask(checked, _task.taskId, _task.projectId);
+    int result =
+        await databaseHelper.deleteTask(checked, _task.taskId, _task.projectId);
     if (result != 0) {
-      VisualHelper.showAlertDialog(context, "Status", "Task Deleted Successfully");
-
+      VisualHelper.showAlertDialog(
+          context, "Status", "Task Deleted Successfully");
     } else {
-      VisualHelper.showAlertDialog(context, "Status", "Error Occured while Deleting Task");
+      VisualHelper.showAlertDialog(
+          context, "Status", "Error Occured while Deleting Task");
     }
   }
 }
