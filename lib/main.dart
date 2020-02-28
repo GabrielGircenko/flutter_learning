@@ -10,7 +10,10 @@ class MyApp extends StatelessWidget {
       title: "PriorityKeeper",
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple
+        primarySwatch: Colors.blue
+        
+        // orange: #F79420
+        // blue: #00223D
       ),
       home: Home(),
     );
